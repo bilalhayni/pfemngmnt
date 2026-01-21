@@ -51,8 +51,43 @@ db.connect((err) => {
     console.error("Database connection failed:", err);
   } else {
     console.log("Connected to MySQL database");
+    // Create default admin user if not exists
+    createDefaultAdmin();
   }
 });
+
+// Function to create default admin user on server startup
+const createDefaultAdmin = () => {
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@pfe.com";
+  const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+
+  // Check if admin user already exists
+  db.query("SELECT id FROM users WHERE email = ? AND role = 3", [adminEmail], (err, result) => {
+    if (err) {
+      console.error("Error checking for admin user:", err);
+      return;
+    }
+
+    if (result.length === 0) {
+      // Create admin user
+      db.query(
+        "INSERT INTO users (email, password, firstName, lastName, role, valid) VALUES (?, ?, ?, ?, 3, 1)",
+        [adminEmail, adminPassword, "Admin", "System"],
+        (err, result) => {
+          if (err) {
+            console.error("Error creating admin user:", err);
+          } else {
+            console.log("Default admin user created successfully");
+            console.log(`  Email: ${adminEmail}`);
+            console.log(`  Password: ${adminPassword}`);
+          }
+        }
+      );
+    } else {
+      console.log("Admin user already exists");
+    }
+  });
+};
 
 // ************************* Registration *****************************
 

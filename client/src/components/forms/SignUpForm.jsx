@@ -26,14 +26,16 @@ const SignUpForm = () => {
       description: 'Parlez-nous de votre parcours',
       fields: [
         {
-          name: 'role',
-          label: 'Vous êtes',
+          name: 'prerequis',
+          label: 'Prequis',
           type: 'select',
           required: true,
           options: [
-            { value: 'student', label: 'Étudiant' },
-            { value: 'professor', label: 'Professeur' },
-            { value: 'admin', label: 'Administrateur' }
+            { value: 'programmation', label: 'Programmation' },
+            { value: 'base_de_donnees', label: 'Base de données' },
+            { value: 'reseaux', label: 'Réseaux' },
+            { value: 'mathematiques', label: 'Mathématiques' },
+            { value: 'systemes', label: 'Systèmes d\'exploitation' }
           ]
         },
         {
@@ -49,7 +51,7 @@ const SignUpForm = () => {
             { value: 'biologie', label: 'Biologie' }
           ]
         },
-        { name: 'cne', label: 'CNE (pour étudiants)', placeholder: 'Votre CNE', hint: 'Laissez vide si vous êtes professeur' },
+        { name: 'cne', label: 'CNE', placeholder: 'Votre CNE', required: true },
         { name: 'cin', label: 'CIN', placeholder: 'Votre CIN', required: true }
       ]
     },
@@ -92,7 +94,7 @@ const SignUpForm = () => {
 
     setIsSubmitting(true);
 
-    // Prepare data for API
+    // Prepare data for API - Only students can register
     const registrationData = {
       firstName: formData.firstName,
       lastName: formData.lastName,
@@ -102,7 +104,8 @@ const SignUpForm = () => {
       cne: formData.cne || '',
       cin: formData.cin,
       department: formData.department,
-      role: formData.role
+      role: 2, // Student role only
+      prerequis: formData.prerequis
     };
 
     const result = await register(registrationData);
