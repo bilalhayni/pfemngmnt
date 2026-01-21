@@ -41,23 +41,8 @@ const LoginForm = () => {
     setIsLoading(false);
 
     if (result.success) {
-      // Navigate based on role
-      switch (result.role) {
-        case ROLES.PROFESSOR:
-          navigate('/prof/home');
-          break;
-        case ROLES.CHEF_DEPARTEMENT:
-          navigate('/');
-          break;
-        case ROLES.STUDENT:
-          navigate('/student/home');
-          break;
-        case ROLES.ADMIN:
-          navigate('/admin/home');
-          break;
-        default:
-          navigate('/');
-      }
+      // All users go to the same /home route
+      navigate('/home');
     } else {
       Swal.fire({
         icon: 'error',
