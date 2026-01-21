@@ -63,7 +63,8 @@ export const AuthProvider = ({ children }) => {
       const response = await api.post('/login', { email, password });
 
       if (response.data && !response.data.message) {
-        const userData = response.data[0];
+        // Handle both array and object response formats
+        const userData = Array.isArray(response.data) ? response.data[0] : response.data;
 
         if (userData.role === ROLES.STUDENT && userData.valid === 0) {
           return {
@@ -75,6 +76,7 @@ export const AuthProvider = ({ children }) => {
         Cookies.set('auth', 'true', { expires: 7 });
         Cookies.set('role', userData.role.toString(), { expires: 7 });
         Cookies.set('userId', userData.id?.toString() || userData.idProfesseur?.toString() || userData.idEtudiant?.toString(), { expires: 7 });
+        Cookies.set('filId', userData.idFiliere?.toString() || '', { expires: 7 });
 
         setUser({
           id: userData.id || userData.idProfesseur || userData.idEtudiant,
@@ -82,6 +84,7 @@ export const AuthProvider = ({ children }) => {
           email: userData.email,
           firstName: userData.firstName,
           lastName: userData.lastName,
+          idFiliere: userData.idFiliere,
           ...userData
         });
 
