@@ -1,0 +1,115 @@
+/* Add Form Overlay */
+.add-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 20px;
+  overflow-y: auto;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Add Form Container */
+.add-form-container {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Close Button */
+.add-form-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background-color: #f3f4f6;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.add-form-close:hover {
+  background-color: #fee2e2;
+}
+
+.add-form-close svg {
+  width: 18px;
+  height: 18px;
+  color: #6b7280;
+  transition: color 0.2s ease;
+}
+
+.add-form-close:hover svg {
+  color: #dc2626;
+}
+
+/* Scrollbar for form container */
+.add-form-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.add-form-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.add-form-container::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 3px;
+}
+
+.add-form-container::-webkit-scrollbar-thumb:hover {
+  background-color: #9ca3af;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .add-form-overlay {
+    padding: 10px;
+    align-items: flex-start;
+  }
+
+  .add-form-container {
+    max-height: none;
+    margin-top: 20px;
+  }
+
+  .add-form-close {
+    top: 12px;
+    right: 12px;
+  }
+}

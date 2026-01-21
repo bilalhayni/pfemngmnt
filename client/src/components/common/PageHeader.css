@@ -1,0 +1,90 @@
+/* Page Header */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  gap: 16px;
+}
+
+.page-header__content {
+  flex: 1;
+}
+
+.page-header__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 4px 0;
+}
+
+.page-header__subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.page-header__action {
+  flex-shrink: 0;
+}
+
+/* Button Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  text-decoration: none;
+}
+
+.btn--primary {
+  background-color: #4f6bed;
+  color: #ffffff;
+}
+
+.btn--primary:hover {
+  background-color: #3b5bdb;
+}
+
+.btn--secondary {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.btn--secondary:hover {
+  background-color: #e5e7eb;
+}
+
+.btn--outline {
+  background-color: transparent;
+  border: 1px solid #e8eaed;
+  color: #4b5563;
+}
+
+.btn--outline:hover {
+  background-color: #f8fafc;
+  border-color: #d1d5db;
+}
+
+.btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-header__title {
+    font-size: 20px;
+  }
+}

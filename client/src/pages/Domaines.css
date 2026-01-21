@@ -1,0 +1,97 @@
+/* Domaines Page Styles */
+
+/* Domain Name Cell */
+.domain-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.domain-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.domain-icon svg {
+  width: 18px;
+  height: 18px;
+  color: #ffffff;
+}
+
+/* Domains Summary Card */
+.domains-summary {
+  margin-bottom: 24px;
+}
+
+.domains-summary__card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e8eaed;
+}
+
+.domains-summary__header {
+  margin-bottom: 20px;
+}
+
+.domains-summary__header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.domains-summary__bars {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Domain Bar */
+.domain-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.domain-bar__label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.domain-bar__name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a2e;
+}
+
+.domain-bar__count {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.domain-bar__track {
+  height: 8px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.domain-bar__fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+@media (max-width: 768px) {
+  .domains-summary__card {
+    padding: 20px;
+  }
+}
