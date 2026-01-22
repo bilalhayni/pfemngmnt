@@ -1,0 +1,375 @@
+/* Shared Student Pages Styles */
+
+.student-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: #64748b;
+  font-size: 1rem;
+}
+
+.student-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.student-empty svg {
+  width: 64px;
+  height: 64px;
+  stroke: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+.student-empty p {
+  color: #64748b;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* PFE Title */
+.pfe-title {
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.pfe-places {
+  background: #f1f5f9;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  color: #475569;
+}
+
+/* Action buttons */
+.table-action-btn--apply {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: #4f6bed;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.table-action-btn--apply:hover:not(:disabled) {
+  background: #3b5bdb;
+}
+
+.table-action-btn--apply:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.table-action-btn--apply svg {
+  width: 14px;
+  height: 14px;
+}
+
+.table-action-btn--cancel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.table-action-btn--cancel:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.table-action-btn--cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.table-action-btn--cancel svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Status badges specific to students */
+.status-badge--waiting {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.status-badge--assigned {
+  background: #d1fae5;
+  color: #059669;
+}
+
+/* PFE Details Page */
+.pfe-details {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pfe-details__header {
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.pfe-details__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.pfe-details__meta {
+  display: flex;
+  gap: 1.5rem;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.pfe-details__meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pfe-details__meta-item svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pfe-details__section {
+  margin-bottom: 1.5rem;
+}
+
+.pfe-details__section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.75rem 0;
+}
+
+.pfe-details__description {
+  color: #475569;
+  line-height: 1.6;
+}
+
+.pfe-details__prerequisites {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pfe-details__prerequisite {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+}
+
+.pfe-details__actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.pfe-details__apply-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #4f6bed;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pfe-details__apply-btn:hover:not(:disabled) {
+  background: #3b5bdb;
+}
+
+.pfe-details__apply-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pfe-details__back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #f1f5f9;
+  color: #475569;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.pfe-details__back-btn:hover {
+  background: #e2e8f0;
+}
+
+/* Profile Page */
+.student-profile {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .student-profile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.student-profile__card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.student-profile__avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #4f6bed;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin: 0 auto 1rem;
+}
+
+.student-profile__name {
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+}
+
+.student-profile__email {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.student-profile__info {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.student-profile__info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.student-profile__info-item:last-child {
+  border-bottom: none;
+}
+
+.student-profile__info-label {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.student-profile__info-value {
+  color: #1e293b;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.student-profile__form-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 1.5rem 0;
+}
+
+.student-profile__form-group {
+  margin-bottom: 1rem;
+}
+
+.student-profile__form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.student-profile__form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.student-profile__form-input:focus {
+  outline: none;
+  border-color: #4f6bed;
+  box-shadow: 0 0 0 3px rgba(79, 107, 237, 0.1);
+}
+
+.student-profile__form-submit {
+  width: 100%;
+  padding: 0.875rem;
+  background: #4f6bed;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.student-profile__form-submit:hover:not(:disabled) {
+  background: #3b5bdb;
+}
+
+.student-profile__form-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
