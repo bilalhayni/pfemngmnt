@@ -45,6 +45,9 @@ const MultiStepForm = ({
 
   return (
     <div className="multistep-form">
+              <div className="signup-logo">
+                <img src="/logo-fpn.svg" alt="Faculté Pluridisciplinaire de Nador" />
+              </div>
       {title && (
         <div className="multistep-form__header">
           <h2 className="multistep-form__title">{title}</h2>

@@ -9,31 +9,27 @@ const Header = ({ title, userName, userEmail, userInitials }) => {
   const navigate = useNavigate();
   const { logout, user, ROLES } = useAuth();
 
-  // Determine profile and settings routes based on user role
+  // Determine profile route based on user role
   const getProfileRoute = () => {
     if (!user) return '/profile';
     switch (user.role) {
-      case ROLES.PROFESSOR: return '/prof/profile';
-      case ROLES.STUDENT: return '/student/profile';
-      case ROLES.ADMIN: return '/admin/profile';
-      case ROLES.CHEF_DEPARTEMENT: return '/profile';
-      default: return '/profile';
-    }
-  };
-
-  const getSettingsRoute = () => {
-    if (!user) return '/settings';
-    switch (user.role) {
-      case ROLES.PROFESSOR: return '/prof/settings';
-      case ROLES.STUDENT: return '/student/settings';
-      case ROLES.ADMIN: return '/admin/settings';
-      case ROLES.CHEF_DEPARTEMENT: return '/settings';
-      default: return '/settings';
+      case ROLES.PROFESSOR:
+        return '/prof/profile';
+      case ROLES.STUDENT:
+        return '/student/profile';
+      case ROLES.ADMIN:
+        return '/admin/profile';
+      case ROLES.CHEF_DEPARTEMENT:
+        return '/profile';
+      default:
+        return '/profile';
     }
   };
 
   // Close dropdown when clicking outside or pressing ESC
   useEffect(() => {
+    if (!isProfileOpen) return;
+
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setIsProfileOpen(false);
@@ -46,15 +42,13 @@ const Header = ({ title, userName, userEmail, userInitials }) => {
       }
     };
 
-    if (isProfileOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('keydown', handleEscKey);
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscKey);
 
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-        document.removeEventListener('keydown', handleEscKey);
-      };
-    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscKey);
+    };
   }, [isProfileOpen]);
 
   const handleSignOut = async () => {
@@ -66,11 +60,6 @@ const Header = ({ title, userName, userEmail, userInitials }) => {
   const handleProfileClick = () => {
     setIsProfileOpen(false);
     navigate(getProfileRoute());
-  };
-
-  const handleSettingsClick = () => {
-    setIsProfileOpen(false);
-    navigate(getSettingsRoute());
   };
 
   return (
@@ -91,7 +80,13 @@ const Header = ({ title, userName, userEmail, userInitials }) => {
         <div className="header__user" ref={profileRef}>
           <div
             className={`header__avatar ${isProfileOpen ? 'header__avatar--active' : ''}`}
-            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            role="button"
+            tabIndex={0}
+            aria-expanded={isProfileOpen}
+            onClick={() => setIsProfileOpen((v) => !v)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') setIsProfileOpen((v) => !v);
+            }}
           >
             {userInitials || userName?.slice(0, 2).toUpperCase() || 'US'}
           </div>
@@ -119,15 +114,6 @@ const Header = ({ title, userName, userEmail, userInitials }) => {
                       <circle cx="12" cy="7" r="4" />
                     </svg>
                     Mon Profil
-                  </button>
-                </li>
-                <li>
-                  <button className="profile-dropdown__item" onClick={handleSettingsClick}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="3" />
-                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                    </svg>
-                    Paramètres
                   </button>
                 </li>
               </ul>
