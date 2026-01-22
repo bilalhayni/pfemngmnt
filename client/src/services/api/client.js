@@ -4,6 +4,16 @@ import Cookies from 'js-cookie';
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
 /**
+ * Clear all authentication cookies
+ */
+export const clearAuthCookies = () => {
+  Cookies.remove('auth');
+  Cookies.remove('role');
+  Cookies.remove('userId');
+  Cookies.remove('filId');
+};
+
+/**
  * Axios client instance with authentication interceptors
  */
 const apiClient = axios.create({
@@ -72,15 +82,5 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-/**
- * Clear all authentication cookies
- */
-export const clearAuthCookies = () => {
-  Cookies.remove('auth');
-  Cookies.remove('role');
-  Cookies.remove('userId');
-  Cookies.remove('filId');
-};
 
 export default apiClient;
