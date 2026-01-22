@@ -43,6 +43,9 @@ const StudentRequests = lazy(() => import('./pages/professor/StudentRequests'));
 const MyStudents = lazy(() => import('./pages/professor/MyStudents'));
 const ProfessorProfile = lazy(() => import('./pages/professor/ProfessorProfile'));
 
+// Shared Pages
+const UserProfile = lazy(() => import('./pages/UserProfile'));
+
 // Page Not Found
 const PageNotFound = lazy(() => import('./pages/PageNotFound'));
 
@@ -79,6 +82,7 @@ function App() {
               <Route path="/pfes-etudiants" element={<PfesEtudiants />} />
               <Route path="/demandes" element={<Demandes />} />
               <Route path="/domaines" element={<Domaines />} />
+              <Route path="/users/:userId" element={<UserProfile />} />
               <Route path="/profile" element={<Dashboard />} />
               <Route path="/settings" element={<Dashboard />} />
             </Route>
@@ -94,6 +98,11 @@ function App() {
               <Route path="profile" element={<ProfessorProfile />} />
             </Route>
 
+            {/* Shared Routes - User Profile Viewing (Professor can access) */}
+            <Route element={<PrivateRoute allowedRoles={ROLES.PROFESSOR} />}>
+              <Route path="/users/:userId" element={<UserProfile />} />
+            </Route>
+
             {/* Admin Routes (role === 3) */}
             <Route path="/admin" element={<PrivateRoute allowedRoles={ROLES.ADMIN} />}>
               <Route path="home" element={<AdminDashboard />} />
@@ -103,6 +112,11 @@ function App() {
               <Route path="chef-departement" element={<ListChefDepartement />} />
               <Route path="create-account" element={<CreateAccount />} />
               <Route path="create-filiere" element={<CreateFiliere />} />
+            </Route>
+
+            {/* Shared Routes - User Profile Viewing (Admin can access) */}
+            <Route element={<PrivateRoute allowedRoles={ROLES.ADMIN} />}>
+              <Route path="/users/:userId" element={<UserProfile />} />
             </Route>
 
             {/* Student Routes (role === 2) */}

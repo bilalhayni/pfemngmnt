@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/layout';
 import { DataTable, PageHeader } from '../../components/common';
 import { adminService } from '../../services/api';
@@ -7,6 +8,7 @@ import './AdminPages.css';
 
 const ListChefDepartement = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [chefs, setChefs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
@@ -89,6 +91,7 @@ const ListChefDepartement = () => {
           <button
             className="table-action-btn table-action-btn--view"
             title="Voir le profil"
+            onClick={() => navigate(`/users/${row.id}`)}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
