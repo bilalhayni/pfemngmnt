@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context';
-import { PrivateRoute, PrivateRouteProf, PrivateRouteAdmin, PrivateRouteStudent } from './routes';
+import { PrivateRoute, PrivateRouteProf, PrivateRouteAdmin, PrivateRouteStudent, PrivateRouteAuth } from './routes';
 
 // Forms
 import { LoginForm, SignUpForm } from './components/forms';
@@ -28,6 +28,11 @@ function App() {
         {/* Public Routes */}
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignUpForm />} />
+
+        {/* Unified Home Route (all authenticated users) */}
+        <Route element={<PrivateRouteAuth />}>
+          <Route path="/home" element={<Dashboard />} />
+        </Route>
 
         {/* Chef Département Routes (role === 1) */}
         <Route element={<PrivateRoute />}>
