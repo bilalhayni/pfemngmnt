@@ -1,13 +1,116 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout } from '../components/layout';
 import { DataTable, PageHeader } from '../components/common';
+import { useAuth } from '../context/AuthContext';
+import { chefDepartementService } from '../services/api';
 import './Domaines.css';
 
 const Domaines = () => {
+  const { user } = useAuth();
+  const [domains, setDomains] = useState([]);
+  const [prerequisites, setPrerequisites] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddDomain, setShowAddDomain] = useState(false);
+  const [showAddPrerequis, setShowAddPrerequis] = useState(false);
+  const [newDomainName, setNewDomainName] = useState('');
+  const [newPrerequisName, setNewPrerequisName] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const userName = user?.firstName
+    ? `${user.firstName} ${user.lastName || ''}`
+    : 'Chef';
+  const userInitials = user?.firstName
+    ? `${user.firstName[0]}${user.lastName?.[0] || ''}`
+    : 'CH';
+
+  const colors = ['#4f6bed', '#22c55e', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#ec4899'];
+
+  const fetchData = async () => {
+    if (!user?.idFiliere) return;
+
+    setLoading(true);
+    try {
+      const [domainsResponse, prerequisResponse] = await Promise.all([
+        chefDepartementService.getDomains(user.idFiliere),
+        chefDepartementService.getPrerequisites(user.idFiliere)
+      ]);
+
+      if (domainsResponse?.data) {
+        const formattedDomains = domainsResponse.data.map((domain, index) => ({
+          id: domain.id_domaine,
+          name: domain.name,
+          color: colors[index % colors.length],
+          type: 'Domaine'
+        }));
+        setDomains(formattedDomains);
+      }
+
+      if (prerequisResponse?.data) {
+        const formattedPrerequis = prerequisResponse.data.map((prereq, index) => ({
+          id: prereq.idprerequis,
+          name: prereq.name,
+          color: colors[(index + 3) % colors.length],
+          type: 'Prérequis'
+        }));
+        setPrerequisites(formattedPrerequis);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [user]);
+
+  const handleAddDomain = async (e) => {
+    e.preventDefault();
+    if (!newDomainName.trim()) return;
+
+    setSubmitting(true);
+    try {
+      await chefDepartementService.addDomain({
+        idFiliere: user.idFiliere,
+        name: newDomainName.trim()
+      });
+      setNewDomainName('');
+      setShowAddDomain(false);
+      fetchData();
+    } catch (error) {
+      console.error('Error adding domain:', error);
+      alert('Erreur lors de l\'ajout du domaine');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleAddPrerequis = async (e) => {
+    e.preventDefault();
+    if (!newPrerequisName.trim()) return;
+
+    setSubmitting(true);
+    try {
+      await chefDepartementService.addPrerequisite({
+        idFiliere: user.idFiliere,
+        name: newPrerequisName.trim()
+      });
+      setNewPrerequisName('');
+      setShowAddPrerequis(false);
+      fetchData();
+    } catch (error) {
+      console.error('Error adding prerequisite:', error);
+      alert('Erreur lors de l\'ajout du prérequis');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const columns = [
     {
       key: 'name',
-      label: 'Domaine',
+      label: 'Nom',
       render: (value, row) => (
         <div className="domain-name">
           <div className="domain-icon" style={{ backgroundColor: row.color }}>
@@ -22,105 +125,102 @@ const Domaines = () => {
         </div>
       )
     },
-    { key: 'description', label: 'Description' },
-    { key: 'pfesCount', label: 'Nombre de PFEs' },
-    { key: 'professorsCount', label: 'Encadrants' },
     {
-      key: 'status',
-      label: 'Statut',
+      key: 'type',
+      label: 'Type',
       render: (value) => (
-        <span className={`status-badge status-badge--${value === 'Actif' ? 'active' : 'inactive'}`}>
+        <span className={`status-badge status-badge--${value === 'Domaine' ? 'active' : 'in-progress'}`}>
           {value}
         </span>
-      )
-    },
-    {
-      key: 'actions',
-      label: 'Actions',
-      sortable: false,
-      render: (_, row) => (
-        <div className="table-actions">
-          <button className="table-action-btn table-action-btn--view" title="Voir PFEs">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-          </button>
-          <button className="table-action-btn table-action-btn--edit" title="Modifier">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-            </svg>
-          </button>
-          <button className="table-action-btn table-action-btn--delete" title="Supprimer">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="3 6 5 6 21 6" />
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-            </svg>
-          </button>
-        </div>
       )
     }
   ];
 
-  const data = [
-    { id: 1, name: 'Développement Web', description: 'Applications web, frameworks modernes, APIs REST', pfesCount: 12, professorsCount: 3, color: '#4f6bed', status: 'Actif' },
-    { id: 2, name: 'Intelligence Artificielle', description: 'Machine Learning, Deep Learning, NLP', pfesCount: 8, professorsCount: 2, color: '#22c55e', status: 'Actif' },
-    { id: 3, name: 'Mobile', description: 'Applications iOS, Android, React Native, Flutter', pfesCount: 6, professorsCount: 2, color: '#f59e0b', status: 'Actif' },
-    { id: 4, name: 'Data Science', description: 'Analyse de données, Big Data, Visualisation', pfesCount: 5, professorsCount: 2, color: '#8b5cf6', status: 'Actif' },
-    { id: 5, name: 'Réseaux & Sécurité', description: 'Cybersécurité, administration réseaux, IoT', pfesCount: 4, professorsCount: 1, color: '#ef4444', status: 'Actif' }
+  // Combine domains and prerequisites for the table
+  const allItems = [
+    ...domains,
+    ...prerequisites
   ];
 
-  const AddButton = (
-    <button className="btn btn--primary">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <line x1="12" y1="5" x2="12" y2="19" />
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-      Ajouter un domaine
-    </button>
-  );
+  if (loading) {
+    return (
+      <Layout pageTitle="Domaines PFE" userName={userName} userInitials={userInitials}>
+        <div className="loading-container">Chargement...</div>
+      </Layout>
+    );
+  }
 
   return (
-    <Layout pageTitle="Domaines PFE" userName="Chef" userInitials="CH">
+    <Layout pageTitle="Domaines PFE" userName={userName} userInitials={userInitials}>
       <PageHeader
-        title="Domaines PFE"
-        subtitle="Gérez les spécialités et domaines des projets de fin d'études"
-        action={AddButton}
+        title="Domaines & Prérequis"
+        subtitle="Gérez les domaines et prérequis des projets de fin d'études"
       />
 
-      <div className="domains-summary">
-        <div className="domains-summary__card">
-          <div className="domains-summary__header">
-            <h3>Répartition des PFEs par domaine</h3>
-          </div>
-          <div className="domains-summary__bars">
-            {data.map((domain) => (
-              <div key={domain.id} className="domain-bar">
-                <div className="domain-bar__label">
-                  <span className="domain-bar__name">{domain.name}</span>
-                  <span className="domain-bar__count">{domain.pfesCount} PFEs</span>
-                </div>
-                <div className="domain-bar__track">
-                  <div
-                    className="domain-bar__fill"
-                    style={{
-                      width: `${(domain.pfesCount / 12) * 100}%`,
-                      backgroundColor: domain.color
-                    }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* Add Domain Form */}
+      <div className="add-forms-container">
+        <div className="add-form-section">
+          <h3>Domaines ({domains.length})</h3>
+          {showAddDomain ? (
+            <form onSubmit={handleAddDomain} className="inline-form">
+              <input
+                type="text"
+                value={newDomainName}
+                onChange={(e) => setNewDomainName(e.target.value)}
+                placeholder="Nom du domaine"
+                disabled={submitting}
+              />
+              <button type="submit" className="btn btn--primary" disabled={submitting}>
+                {submitting ? '...' : 'Ajouter'}
+              </button>
+              <button type="button" className="btn btn--secondary" onClick={() => setShowAddDomain(false)}>
+                Annuler
+              </button>
+            </form>
+          ) : (
+            <button className="btn btn--primary" onClick={() => setShowAddDomain(true)}>
+              + Nouveau domaine
+            </button>
+          )}
+        </div>
+
+        <div className="add-form-section">
+          <h3>Prérequis ({prerequisites.length})</h3>
+          {showAddPrerequis ? (
+            <form onSubmit={handleAddPrerequis} className="inline-form">
+              <input
+                type="text"
+                value={newPrerequisName}
+                onChange={(e) => setNewPrerequisName(e.target.value)}
+                placeholder="Nom du prérequis"
+                disabled={submitting}
+              />
+              <button type="submit" className="btn btn--primary" disabled={submitting}>
+                {submitting ? '...' : 'Ajouter'}
+              </button>
+              <button type="button" className="btn btn--secondary" onClick={() => setShowAddPrerequis(false)}>
+                Annuler
+              </button>
+            </form>
+          ) : (
+            <button className="btn btn--primary" onClick={() => setShowAddPrerequis(true)}>
+              + Nouveau prérequis
+            </button>
+          )}
         </div>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={data}
-        searchPlaceholder="Rechercher un domaine..."
-      />
+      {allItems.length === 0 ? (
+        <div className="empty-state">
+          <p>Aucun domaine ou prérequis trouvé. Commencez par en ajouter.</p>
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={allItems}
+          searchPlaceholder="Rechercher..."
+        />
+      )}
     </Layout>
   );
 };

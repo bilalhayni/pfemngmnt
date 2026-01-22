@@ -1,47 +1,106 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout } from '../components/layout';
 import { DataTable, PageHeader, StatCard } from '../components/common';
+import { useAuth } from '../context/AuthContext';
+import { chefDepartementService } from '../services/api';
 import './MesPfes.css';
 
 const MesPfes = () => {
-  const stats = [
-    { title: 'Total PFEs', value: '5', icon: 'folder', color: 'blue' },
-    { title: 'En cours', value: '3', icon: 'progress', color: 'green' },
-    { title: 'Terminés', value: '2', icon: 'check', color: 'purple' }
-  ];
+  const { user } = useAuth();
+  const [pfes, setPfes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(null);
+
+  const userName = user?.firstName
+    ? `${user.firstName} ${user.lastName || ''}`
+    : 'Chef';
+  const userInitials = user?.firstName
+    ? `${user.firstName[0]}${user.lastName?.[0] || ''}`
+    : 'CH';
+
+  const fetchPfes = async () => {
+    if (!user?.id) return;
+
+    setLoading(true);
+    try {
+      const response = await chefDepartementService.getMyPfes(user.id);
+      if (response?.data) {
+        const formattedData = response.data.map(pfe => ({
+          id: pfe.id,
+          title: pfe.titre || 'Sans titre',
+          domain: pfe.domaine || '',
+          filiere: pfe.filiere || '',
+          nbStudents: pfe.nbr_etd || 1,
+          status: pfe.avancement || 'En cours',
+          description: pfe.description || ''
+        }));
+        setPfes(formattedData);
+      }
+    } catch (error) {
+      console.error('Error fetching PFEs:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPfes();
+  }, [user]);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce PFE ?')) return;
+
+    setActionLoading(id);
+    try {
+      await chefDepartementService.deletePfe(id);
+      fetchPfes();
+    } catch (error) {
+      console.error('Error deleting PFE:', error);
+      alert('Erreur lors de la suppression du PFE');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleUpdateProgress = async (id, newStatus) => {
+    setActionLoading(id);
+    try {
+      await chefDepartementService.updatePfeProgress(id, newStatus);
+      fetchPfes();
+    } catch (error) {
+      console.error('Error updating progress:', error);
+      alert('Erreur lors de la mise à jour');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // Calculate stats
+  const totalPfes = pfes.length;
+  const enCours = pfes.filter(p => p.status === 'En cours').length;
+  const termines = pfes.filter(p => p.status === 'Terminé').length;
 
   const columns = [
     { key: 'title', label: 'Titre du PFE' },
-    {
-      key: 'student',
-      label: 'Étudiant',
-      render: (value, row) => (
-        <div className="table-avatar">
-          <div className="table-avatar__image">{row.studentInitials}</div>
-          <span className="table-avatar__name">{value}</span>
-        </div>
-      )
-    },
     { key: 'domain', label: 'Domaine' },
-    { key: 'startDate', label: 'Date début' },
-    {
-      key: 'progress',
-      label: 'Avancement',
-      render: (value) => (
-        <div className="progress-bar-container">
-          <div className="progress-bar">
-            <div className="progress-bar__fill" style={{ width: `${value}%` }}></div>
-          </div>
-          <span className="progress-bar__text">{value}%</span>
-        </div>
-      )
-    },
+    { key: 'nbStudents', label: 'Nb. Étudiants' },
     {
       key: 'status',
       label: 'Statut',
-      render: (value) => {
+      render: (value, row) => {
         const statusClass = value === 'Terminé' ? 'completed' : value === 'En cours' ? 'in-progress' : 'pending';
-        return <span className={`status-badge status-badge--${statusClass}`}>{value}</span>;
+        return (
+          <select
+            className={`status-select status-select--${statusClass}`}
+            value={value}
+            onChange={(e) => handleUpdateProgress(row.id, e.target.value)}
+            disabled={actionLoading === row.id}
+          >
+            <option value="En attente">En attente</option>
+            <option value="En cours">En cours</option>
+            <option value="Terminé">Terminé</option>
+          </select>
+        );
       }
     },
     {
@@ -50,16 +109,15 @@ const MesPfes = () => {
       sortable: false,
       render: (_, row) => (
         <div className="table-actions">
-          <button className="table-action-btn table-action-btn--view" title="Voir détails">
+          <button
+            className="table-action-btn table-action-btn--delete"
+            title="Supprimer"
+            onClick={() => handleDelete(row.id)}
+            disabled={actionLoading === row.id}
+          >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-          </button>
-          <button className="table-action-btn table-action-btn--edit" title="Modifier">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
             </svg>
           </button>
         </div>
@@ -67,43 +125,38 @@ const MesPfes = () => {
     }
   ];
 
-  const data = [
-    { id: 1, title: 'Système de gestion des PFE', student: 'Hamza El Amrani', studentInitials: 'HE', domain: 'Développement Web', startDate: '15/09/2024', progress: 75, status: 'En cours' },
-    { id: 2, title: 'Application mobile de santé', student: 'Sara Bennani', studentInitials: 'SB', domain: 'Mobile', startDate: '01/10/2024', progress: 45, status: 'En cours' },
-    { id: 3, title: 'Plateforme e-learning IA', student: 'Omar Idrissi', studentInitials: 'OI', domain: 'IA', startDate: '20/09/2024', progress: 100, status: 'Terminé' },
-    { id: 4, title: 'Chatbot intelligent', student: 'Nadia Chraibi', studentInitials: 'NC', domain: 'NLP', startDate: '05/10/2024', progress: 30, status: 'En cours' },
-    { id: 5, title: 'Système de recommandation', student: 'Yassine Berrada', studentInitials: 'YB', domain: 'Machine Learning', startDate: '01/09/2024', progress: 100, status: 'Terminé' }
-  ];
-
-  const AddButton = (
-    <button className="btn btn--primary">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <line x1="12" y1="5" x2="12" y2="19" />
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-      Nouveau PFE
-    </button>
-  );
+  if (loading) {
+    return (
+      <Layout pageTitle="Mes PFE's" userName={userName} userInitials={userInitials}>
+        <div className="loading-container">Chargement...</div>
+      </Layout>
+    );
+  }
 
   return (
-    <Layout pageTitle="Mes PFE's" userName="Chef" userInitials="CH">
+    <Layout pageTitle="Mes PFE's" userName={userName} userInitials={userInitials}>
       <PageHeader
         title="Mes PFE's"
-        subtitle="Gérez les projets de fin d'études que vous encadrez"
-        action={AddButton}
+        subtitle="Projets de fin d'études que vous encadrez"
       />
 
       <div className="stats-row">
-        <StatCard title="Total PFEs" value="5" subtitle="Projets encadrés" color="blue" icon="folder" />
-        <StatCard title="En cours" value="3" subtitle="Projets actifs" color="green" icon="progress" />
-        <StatCard title="Terminés" value="2" subtitle="Projets complétés" color="purple" icon="check" />
+        <StatCard title="Total PFEs" value={totalPfes} subtitle="Projets encadrés" icon="folder" iconBgColor="#4f6bed" />
+        <StatCard title="En cours" value={enCours} subtitle="Projets actifs" icon="progress" iconBgColor="#10b981" />
+        <StatCard title="Terminés" value={termines} subtitle="Projets complétés" icon="check" iconBgColor="#8b5cf6" />
       </div>
 
-      <DataTable
-        columns={columns}
-        data={data}
-        searchPlaceholder="Rechercher un PFE..."
-      />
+      {pfes.length === 0 ? (
+        <div className="empty-state">
+          <p>Vous n'avez pas encore de PFE. Créez-en un pour commencer.</p>
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={pfes}
+          searchPlaceholder="Rechercher un PFE..."
+        />
+      )}
     </Layout>
   );
 };
