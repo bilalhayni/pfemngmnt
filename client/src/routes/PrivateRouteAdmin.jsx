@@ -1,16 +1,26 @@
 import { Outlet, Navigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import { useAuth } from '../context/AuthContext';
+import { Loading } from '../components/common';
 
-// Admin route (role === 3)
+/**
+ * Protected route for Admin (role === 3)
+ * Uses AuthContext instead of accessing cookies directly
+ */
 const PrivateRouteAdmin = () => {
-  const auth = Cookies.get('auth');
-  const role = Cookies.get('role');
+  const { user, loading, isAuthenticated, hasRole, ROLES } = useAuth();
 
-  if (!auth) {
+  // Show loading spinner while checking auth
+  if (loading) {
+    return <Loading fullPage message="Vérification de l'authentification..." />;
+  }
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
 
-  if (role !== '3') {
+  // Redirect to login if user doesn't have Admin role
+  if (!hasRole(ROLES.ADMIN)) {
     return <Navigate to="/login" replace />;
   }
 

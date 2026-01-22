@@ -1,16 +1,26 @@
 import { Outlet, Navigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import { useAuth } from '../context/AuthContext';
+import { Loading } from '../components/common';
 
-// Professor route (role === 0)
+/**
+ * Protected route for Professor (role === 0)
+ * Uses AuthContext instead of accessing cookies directly
+ */
 const PrivateRouteProf = () => {
-  const auth = Cookies.get('auth');
-  const role = Cookies.get('role');
+  const { user, loading, isAuthenticated, hasRole, ROLES } = useAuth();
 
-  if (!auth) {
+  // Show loading spinner while checking auth
+  if (loading) {
+    return <Loading fullPage message="Vérification de l'authentification..." />;
+  }
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
 
-  if (role !== '0') {
+  // Redirect to login if user doesn't have Professor role
+  if (!hasRole(ROLES.PROFESSOR)) {
     return <Navigate to="/login" replace />;
   }
 
