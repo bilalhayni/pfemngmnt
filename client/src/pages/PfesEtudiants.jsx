@@ -1,9 +1,55 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout } from '../components/layout';
 import { DataTable, PageHeader } from '../components/common';
+import { useAuth } from '../context/AuthContext';
+import { chefDepartementService } from '../services/api';
 import './PfesEtudiants.css';
 
 const PfesEtudiants = () => {
+  const { user } = useAuth();
+  const [assignments, setAssignments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const userName = user?.firstName
+    ? `${user.firstName} ${user.lastName || ''}`
+    : 'Chef';
+  const userInitials = user?.firstName
+    ? `${user.firstName[0]}${user.lastName?.[0] || ''}`
+    : 'CH';
+
+  useEffect(() => {
+    const fetchAssignments = async () => {
+      if (!user?.id) return;
+
+      setLoading(true);
+      try {
+        const response = await chefDepartementService.getAssignedStudents(user.id);
+        if (response?.data) {
+          const formattedData = response.data.map(item => ({
+            id: item.id,
+            student: item.fname || 'N/A',
+            studentInitials: item.fname
+              ? item.fname.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+              : 'NA',
+            pfeTitle: item.titre || 'Sans titre',
+            pfeId: item.idPfe,
+            date: item.date || '',
+            status: item.avancement || 'En cours',
+            defenseDate: item.dateSoutenance || null,
+            nbStudents: item.nbr_etd || 1
+          }));
+          setAssignments(formattedData);
+        }
+      } catch (error) {
+        console.error('Error fetching assignments:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAssignments();
+  }, [user]);
+
   const columns = [
     {
       key: 'student',
@@ -11,40 +57,24 @@ const PfesEtudiants = () => {
       render: (value, row) => (
         <div className="table-avatar">
           <div className="table-avatar__image">{row.studentInitials}</div>
-          <div className="table-avatar__info">
-            <span className="table-avatar__name">{value}</span>
-            <span className="table-avatar__email">{row.email}</span>
-          </div>
+          <span className="table-avatar__name">{value}</span>
         </div>
       )
     },
-    { key: 'cne', label: 'CNE' },
-    { key: 'filiere', label: 'Filière' },
     { key: 'pfeTitle', label: 'Titre du PFE' },
-    {
-      key: 'supervisor',
-      label: 'Encadrant',
-      render: (value) => value || <span className="text-muted">Non assigné</span>
-    },
-    {
-      key: 'progress',
-      label: 'Avancement',
-      render: (value) => (
-        <div className="progress-bar-container">
-          <div className="progress-bar">
-            <div className="progress-bar__fill" style={{ width: `${value}%` }}></div>
-          </div>
-          <span className="progress-bar__text">{value}%</span>
-        </div>
-      )
-    },
+    { key: 'date', label: 'Date d\'affectation' },
     {
       key: 'status',
-      label: 'Statut',
+      label: 'Avancement',
       render: (value) => {
-        const statusClass = value === 'Soutenu' ? 'completed' : value === 'En cours' ? 'in-progress' : 'pending';
+        const statusClass = value === 'Terminé' ? 'completed' : value === 'En cours' ? 'in-progress' : 'pending';
         return <span className={`status-badge status-badge--${statusClass}`}>{value}</span>;
       }
+    },
+    {
+      key: 'defenseDate',
+      label: 'Soutenance',
+      render: (value) => value || <span className="text-muted">Non planifiée</span>
     },
     {
       key: 'actions',
@@ -58,53 +88,36 @@ const PfesEtudiants = () => {
               <circle cx="12" cy="12" r="3" />
             </svg>
           </button>
-          <button className="table-action-btn table-action-btn--edit" title="Assigner PFE">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-              <circle cx="8.5" cy="7" r="4" />
-              <line x1="20" y1="8" x2="20" y2="14" />
-              <line x1="23" y1="11" x2="17" y2="11" />
-            </svg>
-          </button>
         </div>
       )
     }
   ];
 
-  const data = [
-    { id: 1, student: 'Hamza El Amrani', studentInitials: 'HE', email: 'h.elamrani@etu.univ.ma', cne: 'R130456789', filiere: 'Génie Informatique', pfeTitle: 'Système de gestion des PFE', supervisor: 'Dr. Ahmed Benali', progress: 75, status: 'En cours' },
-    { id: 2, student: 'Sara Bennani', studentInitials: 'SB', email: 's.bennani@etu.univ.ma', cne: 'R130567890', filiere: 'Génie Informatique', pfeTitle: 'Application mobile de santé', supervisor: 'Dr. Fatima Zahra', progress: 45, status: 'En cours' },
-    { id: 3, student: 'Omar Idrissi', studentInitials: 'OI', email: 'o.idrissi@etu.univ.ma', cne: 'R130678901', filiere: 'Data Science', pfeTitle: 'Plateforme e-learning IA', supervisor: 'Dr. Mohamed Tazi', progress: 100, status: 'Soutenu' },
-    { id: 4, student: 'Nadia Chraibi', studentInitials: 'NC', email: 'n.chraibi@etu.univ.ma', cne: 'R130789012', filiere: 'Réseaux', pfeTitle: 'Chatbot intelligent', supervisor: 'Dr. Ahmed Benali', progress: 30, status: 'En cours' },
-    { id: 5, student: 'Yassine Berrada', studentInitials: 'YB', email: 'y.berrada@etu.univ.ma', cne: 'R130890123', filiere: 'Génie Informatique', pfeTitle: 'Système de recommandation', supervisor: 'Dr. Mohamed Tazi', progress: 100, status: 'Soutenu' },
-    { id: 6, student: 'Laila Fassi', studentInitials: 'LF', email: 'l.fassi@etu.univ.ma', cne: 'R130901234', filiere: 'IA', pfeTitle: 'Analyse de sentiments', supervisor: 'Dr. Khadija Alami', progress: 60, status: 'En cours' },
-    { id: 7, student: 'Rachid Amrani', studentInitials: 'RA', email: 'r.amrani@etu.univ.ma', cne: 'R131012345', filiere: 'IoT', pfeTitle: 'Application IoT Smart Home', supervisor: 'Dr. Youssef Mansouri', progress: 20, status: 'En cours' },
-    { id: 8, student: 'Salma Kettani', studentInitials: 'SK', email: 's.kettani@etu.univ.ma', cne: 'R131123456', filiere: 'Data Science', pfeTitle: 'Détection de fraude bancaire', supervisor: 'Dr. Mohamed Tazi', progress: 85, status: 'En cours' }
-  ];
-
-  const ExportButton = (
-    <button className="btn btn--outline">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-        <polyline points="7 10 12 15 17 10" />
-        <line x1="12" y1="15" x2="12" y2="3" />
-      </svg>
-      Exporter
-    </button>
-  );
+  if (loading) {
+    return (
+      <Layout pageTitle="PFE's et Étudiants" userName={userName} userInitials={userInitials}>
+        <div className="loading-container">Chargement...</div>
+      </Layout>
+    );
+  }
 
   return (
-    <Layout pageTitle="PFE's et Étudiants" userName="Chef" userInitials="CH">
+    <Layout pageTitle="PFE's et Étudiants" userName={userName} userInitials={userInitials}>
       <PageHeader
         title="PFE's et Étudiants"
-        subtitle="Relation entre les étudiants et leurs projets de fin d'études"
-        action={ExportButton}
+        subtitle="Étudiants affectés à vos projets de fin d'études"
       />
-      <DataTable
-        columns={columns}
-        data={data}
-        searchPlaceholder="Rechercher par étudiant ou PFE..."
-      />
+      {assignments.length === 0 ? (
+        <div className="empty-state">
+          <p>Aucun étudiant n'est encore affecté à vos PFEs.</p>
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={assignments}
+          searchPlaceholder="Rechercher par étudiant ou PFE..."
+        />
+      )}
     </Layout>
   );
 };

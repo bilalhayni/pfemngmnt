@@ -1,9 +1,80 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout } from '../components/layout';
 import { DataTable, PageHeader, StatCard } from '../components/common';
+import { useAuth } from '../context/AuthContext';
+import { chefDepartementService } from '../services/api';
 import './Demandes.css';
 
 const Demandes = () => {
+  const { user } = useAuth();
+  const [demandes, setDemandes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(null);
+
+  const userName = user?.firstName
+    ? `${user.firstName} ${user.lastName || ''}`
+    : 'Chef';
+  const userInitials = user?.firstName
+    ? `${user.firstName[0]}${user.lastName?.[0] || ''}`
+    : 'CH';
+
+  const fetchDemandes = async () => {
+    if (!user?.id) return;
+
+    setLoading(true);
+    try {
+      const response = await chefDepartementService.getStudentRequests(user.id);
+      if (response?.data) {
+        const formattedData = response.data.map(demande => ({
+          id: demande.id,
+          student: `${demande.firstName || ''} ${demande.lastName || ''}`.trim() || 'N/A',
+          studentInitials: `${demande.firstName?.[0] || ''}${demande.lastName?.[0] || ''}`.toUpperCase() || 'NA',
+          studentId: demande.idUser,
+          pfeTitle: demande.titre || 'Sans titre',
+          date: demande.date || '',
+          status: 'En attente'
+        }));
+        setDemandes(formattedData);
+      }
+    } catch (error) {
+      console.error('Error fetching demandes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDemandes();
+  }, [user]);
+
+  const handleAccept = async (id) => {
+    setActionLoading(id);
+    try {
+      await chefDepartementService.acceptRequest(id);
+      fetchDemandes();
+    } catch (error) {
+      console.error('Error accepting request:', error);
+      alert('Erreur lors de l\'acceptation de la demande');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleReject = async (id) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir rejeter cette demande ?')) return;
+
+    setActionLoading(id);
+    try {
+      await chefDepartementService.rejectRequest(id);
+      fetchDemandes();
+    } catch (error) {
+      console.error('Error rejecting request:', error);
+      alert('Erreur lors du rejet de la demande');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const columns = [
     { key: 'id', label: '#' },
     {
@@ -12,43 +83,18 @@ const Demandes = () => {
       render: (value, row) => (
         <div className="table-avatar">
           <div className="table-avatar__image">{row.studentInitials}</div>
-          <div className="table-avatar__info">
-            <span className="table-avatar__name">{value}</span>
-            <span className="table-avatar__email">{row.email}</span>
-          </div>
+          <span className="table-avatar__name">{value}</span>
         </div>
       )
     },
-    {
-      key: 'type',
-      label: 'Type',
-      render: (value) => {
-        const typeColors = {
-          'Changement sujet': 'blue',
-          'Changement encadrant': 'purple',
-          'Extension délai': 'yellow',
-          'Demande soutenance': 'green'
-        };
-        return <span className={`request-type request-type--${typeColors[value] || 'blue'}`}>{value}</span>;
-      }
-    },
-    { key: 'subject', label: 'Objet' },
+    { key: 'pfeTitle', label: 'PFE demandé' },
     { key: 'date', label: 'Date' },
-    {
-      key: 'priority',
-      label: 'Priorité',
-      render: (value) => {
-        const priorityClass = value === 'Haute' ? 'high' : value === 'Moyenne' ? 'medium' : 'low';
-        return <span className={`priority-badge priority-badge--${priorityClass}`}>{value}</span>;
-      }
-    },
     {
       key: 'status',
       label: 'Statut',
-      render: (value) => {
-        const statusClass = value === 'Approuvée' ? 'completed' : value === 'En attente' ? 'pending' : value === 'En cours' ? 'in-progress' : 'inactive';
-        return <span className={`status-badge status-badge--${statusClass}`}>{value}</span>;
-      }
+      render: (value) => (
+        <span className="status-badge status-badge--pending">{value}</span>
+      )
     },
     {
       key: 'actions',
@@ -56,60 +102,62 @@ const Demandes = () => {
       sortable: false,
       render: (_, row) => (
         <div className="table-actions">
-          <button className="table-action-btn table-action-btn--view" title="Voir détails">
+          <button
+            className="table-action-btn table-action-btn--approve"
+            title="Accepter"
+            onClick={() => handleAccept(row.id)}
+            disabled={actionLoading === row.id}
+          >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-              <circle cx="12" cy="12" r="3" />
+              <polyline points="20 6 9 17 4 12" />
             </svg>
           </button>
-          {row.status === 'En attente' && (
-            <>
-              <button className="table-action-btn table-action-btn--approve" title="Approuver">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </button>
-              <button className="table-action-btn table-action-btn--reject" title="Rejeter">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </>
-          )}
+          <button
+            className="table-action-btn table-action-btn--reject"
+            title="Rejeter"
+            onClick={() => handleReject(row.id)}
+            disabled={actionLoading === row.id}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         </div>
       )
     }
   ];
 
-  const data = [
-    { id: 'DEM-001', student: 'Hamza El Amrani', studentInitials: 'HE', email: 'h.elamrani@etu.univ.ma', type: 'Extension délai', subject: 'Besoin de 2 semaines supplémentaires', date: '15/01/2025', priority: 'Haute', status: 'En attente' },
-    { id: 'DEM-002', student: 'Sara Bennani', studentInitials: 'SB', email: 's.bennani@etu.univ.ma', type: 'Changement sujet', subject: 'Modification du périmètre du projet', date: '14/01/2025', priority: 'Moyenne', status: 'En cours' },
-    { id: 'DEM-003', student: 'Omar Idrissi', studentInitials: 'OI', email: 'o.idrissi@etu.univ.ma', type: 'Demande soutenance', subject: 'Planification de la soutenance', date: '13/01/2025', priority: 'Haute', status: 'Approuvée' },
-    { id: 'DEM-004', student: 'Nadia Chraibi', studentInitials: 'NC', email: 'n.chraibi@etu.univ.ma', type: 'Changement encadrant', subject: 'Demande de co-encadrement', date: '12/01/2025', priority: 'Basse', status: 'En attente' },
-    { id: 'DEM-005', student: 'Yassine Berrada', studentInitials: 'YB', email: 'y.berrada@etu.univ.ma', type: 'Demande soutenance', subject: 'Date de soutenance souhaitée', date: '11/01/2025', priority: 'Haute', status: 'Approuvée' },
-    { id: 'DEM-006', student: 'Laila Fassi', studentInitials: 'LF', email: 'l.fassi@etu.univ.ma', type: 'Extension délai', subject: 'Retard dû à des problèmes techniques', date: '10/01/2025', priority: 'Moyenne', status: 'Rejetée' }
-  ];
+  if (loading) {
+    return (
+      <Layout pageTitle="Demandes" userName={userName} userInitials={userInitials}>
+        <div className="loading-container">Chargement...</div>
+      </Layout>
+    );
+  }
 
   return (
-    <Layout pageTitle="Demandes" userName="Chef" userInitials="CH">
+    <Layout pageTitle="Demandes" userName={userName} userInitials={userInitials}>
       <PageHeader
         title="Demandes"
-        subtitle="Gérez les demandes des étudiants concernant leurs PFE"
+        subtitle="Demandes d'affectation aux PFEs des étudiants"
       />
 
       <div className="stats-row">
-        <StatCard title="Total" value="6" subtitle="Demandes" color="blue" icon="requests" />
-        <StatCard title="En attente" value="2" subtitle="À traiter" color="yellow" icon="pending" />
-        <StatCard title="Approuvées" value="2" subtitle="Validées" color="green" icon="check" />
-        <StatCard title="Rejetées" value="1" subtitle="Refusées" color="red" icon="rejected" />
+        <StatCard title="En attente" value={demandes.length} subtitle="Demandes à traiter" icon="requests" iconBgColor="#f59e0b" />
       </div>
 
-      <DataTable
-        columns={columns}
-        data={data}
-        searchPlaceholder="Rechercher une demande..."
-      />
+      {demandes.length === 0 ? (
+        <div className="empty-state">
+          <p>Aucune demande en attente.</p>
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={demandes}
+          searchPlaceholder="Rechercher une demande..."
+        />
+      )}
     </Layout>
   );
 };

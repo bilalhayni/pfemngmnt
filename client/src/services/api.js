@@ -162,6 +162,45 @@ export const adminService = {
   deleteUser: (id) => api.delete(`/deleteUser/${id}`)
 };
 
+// Chef Département Services
+export const chefDepartementService = {
+  // Stats
+  getStats: (filiereId) => api.get(`/stats/dashboard/${filiereId}`),
+  getMyPfeStats: (userId) => api.get(`/chefDepadv/${userId}`),
+  getAllPfeStats: (filiereId) => api.get(`/chefDepadvAll/${filiereId}`),
+
+  // Professors
+  getProfessors: (filiereId) => api.get(`/prof/${filiereId}`),
+
+  // Students
+  getStudents: (filiereId) => api.get(`/stdListe/${filiereId}`),
+
+  // PFEs
+  getMyPfes: (userId) => api.get(`/myPfe/${userId}`),
+  getAllPfes: (filiereId) => api.get(`/allPfe/${filiereId}`),
+  getPfeDetails: (id) => api.get(`/SinglePfe/${id}`),
+  getPfePrerequisites: (id) => api.get(`/prerequisPfe/${id}`),
+  createPfe: (data) => api.post('/newPfe', data),
+  updatePfe: (data) => api.put('/updatePfe', data),
+  deletePfe: (id) => api.delete(`/deletePfe/${id}`),
+  updatePfeProgress: (id, avancement) => api.put('/updateavan', { id, avancement }),
+  setDefenseDate: (id, date) => api.put('/updateDateSout', { id, date }),
+
+  // Domains & Prerequisites
+  getDomains: (filiereId) => api.get(`/domaineFil/${filiereId}`),
+  getPrerequisites: (filiereId) => api.get(`/prerequisFil/${filiereId}`),
+  addDomain: (data) => api.post('/addDomaine', data),
+  addPrerequisite: (data) => api.post('/addPrerequi', data),
+
+  // Demandes (student requests to professors in filiere)
+  getStudentRequests: (userId) => api.get(`/demandes/${userId}`),
+  acceptRequest: (id) => api.put('/affectPfe', { id }),
+  rejectRequest: (id) => api.delete(`/deleteDemande/${id}`),
+
+  // Students assigned to PFEs
+  getAssignedStudents: (userId) => api.get(`/stdPfe/${userId}`)
+};
+
 // Professor Portal Services
 export const professorPortalService = {
   // Stats
