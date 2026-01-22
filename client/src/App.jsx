@@ -39,6 +39,16 @@ import {
   StudentProfile
 } from './pages/student';
 
+// Professor Pages
+import {
+  ProfessorDashboard,
+  MyPfes as ProfessorMyPfes,
+  CreatePfe,
+  StudentRequests,
+  MyStudents,
+  ProfessorProfile
+} from './pages/professor';
+
 // Page Not Found
 import PageNotFound from './pages/PageNotFound';
 
@@ -71,12 +81,13 @@ function App() {
 
         {/* Professor Routes (role === 0) */}
         <Route path="/prof" element={<PrivateRouteProf />}>
-          <Route path="home" element={<Dashboard />} />
-          <Route path="pfe" element={<MesPfes />} />
-          <Route path="profile" element={<Dashboard />} />
-          <Route path="student" element={<Etudiants />} />
-          <Route path="demandes" element={<Demandes />} />
-          <Route path="domaine" element={<Domaines />} />
+          <Route path="home" element={<ProfessorDashboard />} />
+          <Route path="pfe" element={<ProfessorMyPfes />} />
+          <Route path="pfe/new" element={<CreatePfe />} />
+          <Route path="pfe/edit/:id" element={<CreatePfe />} />
+          <Route path="demandes" element={<StudentRequests />} />
+          <Route path="students" element={<MyStudents />} />
+          <Route path="profile" element={<ProfessorProfile />} />
         </Route>
 
         {/* Admin Routes (role === 3) */}
