@@ -5,9 +5,14 @@ const mysql = require("mysql");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const nodemailer = require("nodemailer");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const app = express();
+
+// JWT Configuration
+const JWT_SECRET = process.env.JWT_SECRET || "your-jwt-secret-key-change-in-production";
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h";
 
 // CORS configuration
 app.use(
@@ -89,7 +94,67 @@ const createDefaultAdmin = () => {
   });
 };
 
-// ************************* Registration *****************************
+// ************************* JWT Middleware *****************************
+
+// Generate JWT token
+const generateToken = (user) => {
+  return jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      idFiliere: user.idFiliere
+    },
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRES_IN }
+  );
+};
+
+// Verify JWT token middleware
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
+
+  if (!token) {
+    return res.status(401).json({ message: "Access denied. No token provided." });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Token expired. Please login again." });
+    }
+    return res.status(403).json({ message: "Invalid token." });
+  }
+};
+
+// Role-based access control middleware
+const requireRole = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Authentication required." });
+    }
+
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+    }
+
+    next();
+  };
+};
+
+// Role constants for clarity
+const ROLES = {
+  PROFESSOR: 0,
+  CHEF_DEPARTEMENT: 1,
+  STUDENT: 2,
+  ADMIN: 3
+};
+
+// ************************* Public Routes (No Auth Required) *****************************
 
 // Get filieres for registration dropdown
 app.get("/filiere", (req, res) => {
@@ -175,10 +240,13 @@ app.post("/login", (req, res) => {
           return res.status(403).json({ message: "Account not yet activated" });
         }
 
+        // Generate JWT token
+        const token = generateToken(user);
+
         req.session.user = user;
         res.cookie("filId", user.idFiliere);
         res.cookie("userId", user.id);
-        res.cookie("auth", true);
+        res.cookie("auth", token); // Store JWT token instead of boolean
         res.cookie("role", user.role);
 
         res.json({
@@ -187,11 +255,44 @@ app.post("/login", (req, res) => {
           firstName: user.firstName,
           lastName: user.lastName,
           role: user.role,
-          idFiliere: user.idFiliere
+          idFiliere: user.idFiliere,
+          token: token // Return token in response body as well
         });
       } else {
         res.status(401).json({ message: "Wrong email/password combination!" });
       }
+    }
+  );
+});
+
+// Verify token endpoint (for checking if user is still authenticated)
+app.get("/verify-token", verifyToken, (req, res) => {
+  res.json({
+    valid: true,
+    user: {
+      id: req.user.id,
+      email: req.user.email,
+      role: req.user.role,
+      idFiliere: req.user.idFiliere
+    }
+  });
+});
+
+// Refresh token endpoint
+app.post("/refresh-token", verifyToken, (req, res) => {
+  // Get user info from database to ensure it's still valid
+  db.query(
+    "SELECT * FROM users WHERE id = ?",
+    [req.user.id],
+    (err, result) => {
+      if (err || result.length === 0) {
+        return res.status(401).json({ message: "User not found" });
+      }
+
+      const user = result[0];
+      const newToken = generateToken(user);
+
+      res.json({ token: newToken });
     }
   );
 });
@@ -206,10 +307,12 @@ app.post("/logout", (req, res) => {
   res.json({ message: "Logged out successfully" });
 });
 
-// ************************* Admin *****************************
+// ************************* Protected Routes *****************************
+
+// ************************* Admin Routes (Role: 3) *****************************
 
 // Admin dashboard stats
-app.get("/admin/stats", (req, res) => {
+app.get("/admin/stats", verifyToken, requireRole(ROLES.ADMIN), (req, res) => {
   const stats = {
     professors: 0,
     chefDepartements: 0,
@@ -259,8 +362,8 @@ app.get("/admin/stats", (req, res) => {
   });
 });
 
-// Create professor/chef departement account
-app.post("/adminCreate", (req, res) => {
+// Create professor/chef departement account (Admin only)
+app.post("/adminCreate", verifyToken, requireRole(ROLES.ADMIN), (req, res) => {
   const { email, password, role, filiere } = req.body;
 
   db.query(
@@ -275,11 +378,128 @@ app.post("/adminCreate", (req, res) => {
   );
 });
 
-// ************************* Profile *****************************
+// Get pending students (for admin)
+app.get("/stdListe", verifyToken, requireRole(ROLES.ADMIN), (req, res) => {
+  db.query(
+    "SELECT users.*, filiere.name as filiere FROM users, filiere WHERE users.valid = 0 AND users.role = 2 AND users.idFiliere = filiere.idFiliere",
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json(result);
+    }
+  );
+});
+
+// Get activated students (for admin)
+app.get("/stdListeAct", verifyToken, requireRole(ROLES.ADMIN), (req, res) => {
+  db.query(
+    "SELECT users.*, filiere.name as filiere FROM users, filiere WHERE users.valid = 1 AND users.role = 2 AND users.idFiliere = filiere.idFiliere",
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json(result);
+    }
+  );
+});
+
+// Get all professors (for admin)
+app.get("/allProf", verifyToken, requireRole(ROLES.ADMIN), (req, res) => {
+  db.query(
+    "SELECT users.*, filiere.name as filiere FROM users, filiere WHERE users.idFiliere = filiere.idFiliere AND users.role = 0",
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json(result);
+    }
+  );
+});
+
+// Get all chefs de departement (for admin)
+app.get("/allChefDep", verifyToken, requireRole(ROLES.ADMIN), (req, res) => {
+  db.query(
+    "SELECT users.*, filiere.name as filiere FROM users, filiere WHERE users.idFiliere = filiere.idFiliere AND users.role = 1",
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json(result);
+    }
+  );
+});
+
+// Activate student account (Admin only)
+app.put("/validStd", verifyToken, requireRole(ROLES.ADMIN), (req, res) => {
+  const { id } = req.body;
+
+  db.query("UPDATE users SET valid = 1 WHERE id = ?", [id], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: "Activation failed" });
+    }
+    res.json({ message: "Student activated" });
+  });
+});
+
+// Block student account (Admin only)
+app.put("/blockStd", verifyToken, requireRole(ROLES.ADMIN), (req, res) => {
+  const { id } = req.body;
+
+  db.query("UPDATE users SET valid = 0 WHERE id = ?", [id], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: "Block failed" });
+    }
+    res.json({ message: "Student blocked" });
+  });
+});
+
+// Delete user (Admin only)
+app.delete("/deleteUser/:id", verifyToken, requireRole(ROLES.ADMIN), (req, res) => {
+  const id = req.params.id;
+
+  db.query("DELETE FROM users WHERE id = ?", [id], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: "Delete failed" });
+    }
+    res.json({ message: "User deleted" });
+  });
+});
+
+// Create filiere (Admin only)
+app.post("/filiere", verifyToken, requireRole(ROLES.ADMIN), (req, res) => {
+  const { name } = req.body;
+
+  db.query("INSERT INTO filiere (name) VALUES (?)", [name], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: "Creation failed" });
+    }
+    res.status(201).json({ message: "Filiere created", id: result.insertId });
+  });
+});
+
+// Delete filiere (Admin only)
+app.delete("/filiere/:id", verifyToken, requireRole(ROLES.ADMIN), (req, res) => {
+  const id = req.params.id;
+
+  db.query("DELETE FROM filiere WHERE idFiliere = ?", [id], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: "Delete failed" });
+    }
+    res.json({ message: "Filiere deleted" });
+  });
+});
+
+// ************************* Profile (All authenticated users) *****************************
 
 // Get profile info
-app.get("/profile/:id", (req, res) => {
+app.get("/profile/:id", verifyToken, (req, res) => {
   const id = req.params.id;
+
+  // Users can only view their own profile unless admin
+  if (req.user.id != id && req.user.role !== ROLES.ADMIN) {
+    return res.status(403).json({ message: "Access denied" });
+  }
 
   db.query(
     "SELECT users.*, filiere.name as filiere FROM users, filiere WHERE users.id = ? AND users.idFiliere = filiere.idFiliere",
@@ -294,7 +514,7 @@ app.get("/profile/:id", (req, res) => {
 });
 
 // Get student profile with prerequisites
-app.get("/profileStd/:id", (req, res) => {
+app.get("/profileStd/:id", verifyToken, (req, res) => {
   const id = req.params.id;
 
   db.query(
@@ -316,8 +536,13 @@ app.get("/profileStd/:id", (req, res) => {
 });
 
 // Update profile
-app.put("/updateProfile", (req, res) => {
+app.put("/updateProfile", verifyToken, (req, res) => {
   const { id, fil, firstName, lastName, email, phone, password } = req.body;
+
+  // Users can only update their own profile unless admin
+  if (req.user.id != id && req.user.role !== ROLES.ADMIN) {
+    return res.status(403).json({ message: "Access denied" });
+  }
 
   db.query(
     "UPDATE users SET idFiliere = ?, firstName = ?, lastName = ?, email = ?, phone = ?, password = ? WHERE id = ?",
@@ -331,10 +556,10 @@ app.put("/updateProfile", (req, res) => {
   );
 });
 
-// ************************* Professors *****************************
+// ************************* Chef Département & Professor Routes *****************************
 
 // Get professors by filiere (for chef departement)
-app.get("/prof/:id", (req, res) => {
+app.get("/prof/:id", verifyToken, requireRole(ROLES.CHEF_DEPARTEMENT, ROLES.ADMIN), (req, res) => {
   const id = req.params.id;
 
   db.query(
@@ -349,36 +574,8 @@ app.get("/prof/:id", (req, res) => {
   );
 });
 
-// Get all professors (for admin)
-app.get("/allProf", (req, res) => {
-  db.query(
-    "SELECT users.*, filiere.name as filiere FROM users, filiere WHERE users.idFiliere = filiere.idFiliere AND users.role = 0",
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.json(result);
-    }
-  );
-});
-
-// Get all chefs de departement (for admin)
-app.get("/allChefDep", (req, res) => {
-  db.query(
-    "SELECT users.*, filiere.name as filiere FROM users, filiere WHERE users.idFiliere = filiere.idFiliere AND users.role = 1",
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.json(result);
-    }
-  );
-});
-
-// ************************* Students *****************************
-
 // Get students by filiere (activated)
-app.get("/stdListe/:id", (req, res) => {
+app.get("/stdListe/:id", verifyToken, requireRole(ROLES.CHEF_DEPARTEMENT, ROLES.ADMIN), (req, res) => {
   const id = req.params.id;
 
   db.query(
@@ -393,72 +590,8 @@ app.get("/stdListe/:id", (req, res) => {
   );
 });
 
-// Get pending students (for admin)
-app.get("/stdListe", (req, res) => {
-  db.query(
-    "SELECT users.*, filiere.name as filiere FROM users, filiere WHERE users.valid = 0 AND users.role = 2 AND users.idFiliere = filiere.idFiliere",
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.json(result);
-    }
-  );
-});
-
-// Get activated students (for admin)
-app.get("/stdListeAct", (req, res) => {
-  db.query(
-    "SELECT users.*, filiere.name as filiere FROM users, filiere WHERE users.valid = 1 AND users.role = 2 AND users.idFiliere = filiere.idFiliere",
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.json(result);
-    }
-  );
-});
-
-// Activate student account
-app.put("/validStd", (req, res) => {
-  const { id } = req.body;
-
-  db.query("UPDATE users SET valid = 1 WHERE id = ?", [id], (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: "Activation failed" });
-    }
-    res.json({ message: "Student activated" });
-  });
-});
-
-// Block student account
-app.put("/blockStd", (req, res) => {
-  const { id } = req.body;
-
-  db.query("UPDATE users SET valid = 0 WHERE id = ?", [id], (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: "Block failed" });
-    }
-    res.json({ message: "Student blocked" });
-  });
-});
-
-// Delete user (reject activation)
-app.delete("/deleteUser/:id", (req, res) => {
-  const id = req.params.id;
-
-  db.query("DELETE FROM users WHERE id = ?", [id], (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: "Delete failed" });
-    }
-    res.json({ message: "User deleted" });
-  });
-});
-
-// ************************* Prerequisites & Domains *****************************
-
 // Get prerequisites by filiere
-app.get("/prerequisFil/:id", (req, res) => {
+app.get("/prerequisFil/:id", verifyToken, (req, res) => {
   const id = req.params.id;
 
   db.query(
@@ -474,7 +607,7 @@ app.get("/prerequisFil/:id", (req, res) => {
 });
 
 // Get domains by filiere
-app.get("/domaineFil/:id", (req, res) => {
+app.get("/domaineFil/:id", verifyToken, (req, res) => {
   const id = req.params.id;
 
   db.query(
@@ -489,8 +622,8 @@ app.get("/domaineFil/:id", (req, res) => {
   );
 });
 
-// Add new domain
-app.post("/addDomaine", (req, res) => {
+// Add new domain (Chef/Admin)
+app.post("/addDomaine", verifyToken, requireRole(ROLES.CHEF_DEPARTEMENT, ROLES.ADMIN), (req, res) => {
   const { idFiliere, name } = req.body;
 
   db.query(
@@ -505,8 +638,8 @@ app.post("/addDomaine", (req, res) => {
   );
 });
 
-// Add new prerequisite
-app.post("/addPrerequi", (req, res) => {
+// Add new prerequisite (Chef/Admin)
+app.post("/addPrerequi", verifyToken, requireRole(ROLES.CHEF_DEPARTEMENT, ROLES.ADMIN), (req, res) => {
   const { idFiliere, name } = req.body;
 
   db.query(
@@ -521,8 +654,8 @@ app.post("/addPrerequi", (req, res) => {
   );
 });
 
-// Add new filiere
-app.post("/addFiliere", (req, res) => {
+// Add new filiere (Admin/Chef)
+app.post("/addFiliere", verifyToken, requireRole(ROLES.CHEF_DEPARTEMENT, ROLES.ADMIN), (req, res) => {
   const { name } = req.body;
 
   db.query("INSERT INTO filiere (name) VALUES (?)", [name], (err, result) => {
@@ -533,34 +666,10 @@ app.post("/addFiliere", (req, res) => {
   });
 });
 
-// Create filiere (alias for addFiliere)
-app.post("/filiere", (req, res) => {
-  const { name } = req.body;
-
-  db.query("INSERT INTO filiere (name) VALUES (?)", [name], (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: "Creation failed" });
-    }
-    res.status(201).json({ message: "Filiere created", id: result.insertId });
-  });
-});
-
-// Delete filiere
-app.delete("/filiere/:id", (req, res) => {
-  const id = req.params.id;
-
-  db.query("DELETE FROM filiere WHERE idFiliere = ?", [id], (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: "Delete failed" });
-    }
-    res.json({ message: "Filiere deleted" });
-  });
-});
-
-// ************************* PFE Management *****************************
+// ************************* PFE Management (Professor/Chef) *****************************
 
 // Create new PFE
-app.post("/newPfe", (req, res) => {
+app.post("/newPfe", verifyToken, requireRole(ROLES.PROFESSOR, ROLES.CHEF_DEPARTEMENT), (req, res) => {
   const { filiere, titre, description, nbr_etd, domaine, prof, avancement, idPrerequisites } = req.body;
 
   db.query(
@@ -588,7 +697,7 @@ app.post("/newPfe", (req, res) => {
 });
 
 // Get own PFEs (for professor/chef)
-app.get("/myPfe/:id", (req, res) => {
+app.get("/myPfe/:id", verifyToken, requireRole(ROLES.PROFESSOR, ROLES.CHEF_DEPARTEMENT), (req, res) => {
   const id = req.params.id;
 
   db.query(
@@ -604,7 +713,7 @@ app.get("/myPfe/:id", (req, res) => {
 });
 
 // Get all PFEs in filiere (for chef departement)
-app.get("/allPfe/:id", (req, res) => {
+app.get("/allPfe/:id", verifyToken, requireRole(ROLES.CHEF_DEPARTEMENT, ROLES.ADMIN), (req, res) => {
   const id = req.params.id;
 
   db.query(
@@ -620,7 +729,7 @@ app.get("/allPfe/:id", (req, res) => {
 });
 
 // Get all PFEs for students
-app.get("/allPfeStd/:id", (req, res) => {
+app.get("/allPfeStd/:id", verifyToken, requireRole(ROLES.STUDENT), (req, res) => {
   const id = req.params.id;
 
   db.query(
@@ -636,7 +745,7 @@ app.get("/allPfeStd/:id", (req, res) => {
 });
 
 // Get single PFE details
-app.get("/SinglePfe/:id", (req, res) => {
+app.get("/SinglePfe/:id", verifyToken, (req, res) => {
   const id = req.params.id;
 
   db.query(
@@ -652,7 +761,7 @@ app.get("/SinglePfe/:id", (req, res) => {
 });
 
 // Get prerequisites for PFE
-app.get("/prerequisPfe/:id", (req, res) => {
+app.get("/prerequisPfe/:id", verifyToken, (req, res) => {
   const id = req.params.id;
 
   db.query(
@@ -668,7 +777,7 @@ app.get("/prerequisPfe/:id", (req, res) => {
 });
 
 // Update PFE
-app.put("/updatePfe", (req, res) => {
+app.put("/updatePfe", verifyToken, requireRole(ROLES.PROFESSOR, ROLES.CHEF_DEPARTEMENT), (req, res) => {
   const { idPfe, titre, description, nbr_etd, domaine, idPrerequisites } = req.body;
 
   db.query(
@@ -697,7 +806,7 @@ app.put("/updatePfe", (req, res) => {
 });
 
 // Update PFE progress
-app.put("/updateavan", (req, res) => {
+app.put("/updateavan", verifyToken, requireRole(ROLES.PROFESSOR, ROLES.CHEF_DEPARTEMENT), (req, res) => {
   const { id, avancement } = req.body;
 
   db.query(
@@ -713,7 +822,7 @@ app.put("/updateavan", (req, res) => {
 });
 
 // Update defense date
-app.put("/updateDateSout", (req, res) => {
+app.put("/updateDateSout", verifyToken, requireRole(ROLES.PROFESSOR, ROLES.CHEF_DEPARTEMENT), (req, res) => {
   const { id, date } = req.body;
 
   db.query(
@@ -729,7 +838,7 @@ app.put("/updateDateSout", (req, res) => {
 });
 
 // Delete PFE
-app.delete("/deletePfe/:id", (req, res) => {
+app.delete("/deletePfe/:id", verifyToken, requireRole(ROLES.PROFESSOR, ROLES.CHEF_DEPARTEMENT, ROLES.ADMIN), (req, res) => {
   const id = req.params.id;
 
   db.query("DELETE FROM pfeprerequis WHERE id_pfe = ?", [id], () => {
@@ -745,7 +854,7 @@ app.delete("/deletePfe/:id", (req, res) => {
 // ************************* Demandes *****************************
 
 // Create demande (student applies for PFE)
-app.post("/addDemande", (req, res) => {
+app.post("/addDemande", verifyToken, requireRole(ROLES.STUDENT), (req, res) => {
   const { id_pfe, id_user, id_prof } = req.body;
 
   db.query(
@@ -761,7 +870,7 @@ app.post("/addDemande", (req, res) => {
 });
 
 // Get demandes for professor
-app.get("/demandes/:id", (req, res) => {
+app.get("/demandes/:id", verifyToken, requireRole(ROLES.PROFESSOR, ROLES.CHEF_DEPARTEMENT), (req, res) => {
   const id = req.params.id;
 
   db.query(
@@ -780,7 +889,7 @@ app.get("/demandes/:id", (req, res) => {
 });
 
 // Get PFE-student list for professor
-app.get("/stdPfe/:id", (req, res) => {
+app.get("/stdPfe/:id", verifyToken, requireRole(ROLES.PROFESSOR, ROLES.CHEF_DEPARTEMENT), (req, res) => {
   const id = req.params.id;
 
   db.query(
@@ -800,7 +909,7 @@ app.get("/stdPfe/:id", (req, res) => {
 });
 
 // Get PFEs student applied to
-app.get("/pfeOfStd/:idUser", (req, res) => {
+app.get("/pfeOfStd/:idUser", verifyToken, requireRole(ROLES.STUDENT), (req, res) => {
   const id = req.params.idUser;
 
   db.query(
@@ -819,7 +928,7 @@ app.get("/pfeOfStd/:idUser", (req, res) => {
 });
 
 // Get student's assigned PFE
-app.get("/MypfeOfStd/:idUser", (req, res) => {
+app.get("/MypfeOfStd/:idUser", verifyToken, requireRole(ROLES.STUDENT), (req, res) => {
   const id = req.params.idUser;
 
   db.query(
@@ -838,7 +947,7 @@ app.get("/MypfeOfStd/:idUser", (req, res) => {
 });
 
 // Approve demande (assign student to PFE)
-app.put("/affectPfe", (req, res) => {
+app.put("/affectPfe", verifyToken, requireRole(ROLES.PROFESSOR, ROLES.CHEF_DEPARTEMENT), (req, res) => {
   const { id } = req.body;
 
   db.query("UPDATE demandes SET dispo = 1 WHERE id = ?", [id], (err, result) => {
@@ -850,7 +959,7 @@ app.put("/affectPfe", (req, res) => {
 });
 
 // Delete demande
-app.delete("/deleteDemande/:id", (req, res) => {
+app.delete("/deleteDemande/:id", verifyToken, (req, res) => {
   const id = req.params.id;
 
   db.query("DELETE FROM demandes WHERE id = ?", [id], (err, result) => {
@@ -861,10 +970,10 @@ app.delete("/deleteDemande/:id", (req, res) => {
   });
 });
 
-// ************************* Student Portal Stats *****************************
+// ************************* Portal Stats *****************************
 
 // Student dashboard stats
-app.get("/student/stats", (req, res) => {
+app.get("/student/stats", verifyToken, requireRole(ROLES.STUDENT), (req, res) => {
   const userId = req.query.userId;
   const filId = req.query.filId;
 
@@ -903,10 +1012,8 @@ app.get("/student/stats", (req, res) => {
   });
 });
 
-// ************************* Professor Portal Stats *****************************
-
 // Professor dashboard stats
-app.get("/professor/stats", (req, res) => {
+app.get("/professor/stats", verifyToken, requireRole(ROLES.PROFESSOR, ROLES.CHEF_DEPARTEMENT), (req, res) => {
   const userId = req.query.userId;
 
   const stats = {
@@ -944,168 +1051,8 @@ app.get("/professor/stats", (req, res) => {
   });
 });
 
-// ************************* Statistics *****************************
-
-// Get professor count by filiere (for admin charts)
-app.get("/profChart", (req, res) => {
-  db.query(
-    "SELECT COUNT(u.id) as num, f.name as name FROM filiere AS f LEFT JOIN users AS u ON u.idFiliere = f.idFiliere AND u.role IN(0,1) GROUP BY f.name",
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.json(result);
-    }
-  );
-});
-
-// Get own PFE progress stats (for chef departement)
-app.get("/chefDepadv/:id", (req, res) => {
-  const id = req.params.id;
-
-  db.query(
-    "SELECT COUNT(pfe.id) as num, avancement FROM pfe WHERE idProf = ? GROUP BY avancement",
-    [id],
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.json(result);
-    }
-  );
-});
-
-// Get all PFE progress stats in filiere
-app.get("/chefDepadvAll/:id", (req, res) => {
-  const id = req.params.id;
-
-  db.query(
-    "SELECT COUNT(pfe.id) as num, avancement FROM pfe WHERE idFiliere = ? GROUP BY avancement",
-    [id],
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.json(result);
-    }
-  );
-});
-
-// Count professors in filiere
-app.get("/numProfChedDep/:id", (req, res) => {
-  const id = req.params.id;
-
-  db.query(
-    "SELECT COUNT(*) as num FROM users WHERE idFiliere = ? AND role = 0",
-    [id],
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.json(result[0]);
-    }
-  );
-});
-
-// Count students in filiere
-app.get("/numStdChedDep/:id", (req, res) => {
-  const id = req.params.id;
-
-  db.query(
-    "SELECT COUNT(*) as num FROM users WHERE idFiliere = ? AND role = 2 AND valid = 1",
-    [id],
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.json(result[0]);
-    }
-  );
-});
-
-// Count PFEs for professor
-app.get("/numPfeProf/:idUser", (req, res) => {
-  const id = req.params.idUser;
-
-  db.query(
-    "SELECT COUNT(*) as num FROM pfe WHERE idProf = ?",
-    [id],
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.json(result[0]);
-    }
-  );
-});
-
-// Count PFEs in filiere
-app.get("/numPfe/:id", (req, res) => {
-  const id = req.params.id;
-
-  db.query(
-    "SELECT COUNT(*) as num FROM pfe WHERE idFiliere = ?",
-    [id],
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.json(result[0]);
-    }
-  );
-});
-
-// Count domains in filiere
-app.get("/numDomaines/:id", (req, res) => {
-  const id = req.params.id;
-
-  db.query(
-    "SELECT COUNT(*) as num FROM domaines WHERE idFiliere = ?",
-    [id],
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.json(result[0]);
-    }
-  );
-});
-
-// Count all professors (for admin)
-app.get("/numProf", (req, res) => {
-  db.query("SELECT COUNT(*) as num FROM users WHERE role = 0", (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: "Database error" });
-    }
-    res.json(result[0]);
-  });
-});
-
-// Count all chefs de departement (for admin)
-app.get("/numChefDep", (req, res) => {
-  db.query("SELECT COUNT(*) as num FROM users WHERE role = 1", (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: "Database error" });
-    }
-    res.json(result[0]);
-  });
-});
-
-// Count all students (for admin)
-app.get("/numStd", (req, res) => {
-  db.query(
-    "SELECT COUNT(*) as num FROM users WHERE role = 2 AND valid = 1",
-    (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.json(result[0]);
-    }
-  );
-});
-
-// Dashboard stats endpoint
-app.get("/stats/dashboard/:filiereId", (req, res) => {
+// Dashboard stats endpoint (Chef Departement)
+app.get("/stats/dashboard/:filiereId", verifyToken, requireRole(ROLES.CHEF_DEPARTEMENT, ROLES.ADMIN), (req, res) => {
   const filiereId = req.params.filiereId;
 
   const queries = {
@@ -1139,7 +1086,167 @@ app.get("/stats/dashboard/:filiereId", (req, res) => {
   });
 });
 
-// ************************* Password Reset *****************************
+// ************************* Statistics (Protected) *****************************
+
+// Get professor count by filiere (for admin charts)
+app.get("/profChart", verifyToken, requireRole(ROLES.ADMIN), (req, res) => {
+  db.query(
+    "SELECT COUNT(u.id) as num, f.name as name FROM filiere AS f LEFT JOIN users AS u ON u.idFiliere = f.idFiliere AND u.role IN(0,1) GROUP BY f.name",
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json(result);
+    }
+  );
+});
+
+// Get own PFE progress stats (for chef departement)
+app.get("/chefDepadv/:id", verifyToken, requireRole(ROLES.CHEF_DEPARTEMENT, ROLES.PROFESSOR), (req, res) => {
+  const id = req.params.id;
+
+  db.query(
+    "SELECT COUNT(pfe.id) as num, avancement FROM pfe WHERE idProf = ? GROUP BY avancement",
+    [id],
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json(result);
+    }
+  );
+});
+
+// Get all PFE progress stats in filiere
+app.get("/chefDepadvAll/:id", verifyToken, requireRole(ROLES.CHEF_DEPARTEMENT), (req, res) => {
+  const id = req.params.id;
+
+  db.query(
+    "SELECT COUNT(pfe.id) as num, avancement FROM pfe WHERE idFiliere = ? GROUP BY avancement",
+    [id],
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json(result);
+    }
+  );
+});
+
+// Count professors in filiere
+app.get("/numProfChedDep/:id", verifyToken, (req, res) => {
+  const id = req.params.id;
+
+  db.query(
+    "SELECT COUNT(*) as num FROM users WHERE idFiliere = ? AND role = 0",
+    [id],
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json(result[0]);
+    }
+  );
+});
+
+// Count students in filiere
+app.get("/numStdChedDep/:id", verifyToken, (req, res) => {
+  const id = req.params.id;
+
+  db.query(
+    "SELECT COUNT(*) as num FROM users WHERE idFiliere = ? AND role = 2 AND valid = 1",
+    [id],
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json(result[0]);
+    }
+  );
+});
+
+// Count PFEs for professor
+app.get("/numPfeProf/:idUser", verifyToken, (req, res) => {
+  const id = req.params.idUser;
+
+  db.query(
+    "SELECT COUNT(*) as num FROM pfe WHERE idProf = ?",
+    [id],
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json(result[0]);
+    }
+  );
+});
+
+// Count PFEs in filiere
+app.get("/numPfe/:id", verifyToken, (req, res) => {
+  const id = req.params.id;
+
+  db.query(
+    "SELECT COUNT(*) as num FROM pfe WHERE idFiliere = ?",
+    [id],
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json(result[0]);
+    }
+  );
+});
+
+// Count domains in filiere
+app.get("/numDomaines/:id", verifyToken, (req, res) => {
+  const id = req.params.id;
+
+  db.query(
+    "SELECT COUNT(*) as num FROM domaines WHERE idFiliere = ?",
+    [id],
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json(result[0]);
+    }
+  );
+});
+
+// Count all professors (for admin)
+app.get("/numProf", verifyToken, requireRole(ROLES.ADMIN), (req, res) => {
+  db.query("SELECT COUNT(*) as num FROM users WHERE role = 0", (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: "Database error" });
+    }
+    res.json(result[0]);
+  });
+});
+
+// Count all chefs de departement (for admin)
+app.get("/numChefDep", verifyToken, requireRole(ROLES.ADMIN), (req, res) => {
+  db.query("SELECT COUNT(*) as num FROM users WHERE role = 1", (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: "Database error" });
+    }
+    res.json(result[0]);
+  });
+});
+
+// Count all students (for admin)
+app.get("/numStd", verifyToken, requireRole(ROLES.ADMIN), (req, res) => {
+  db.query(
+    "SELECT COUNT(*) as num FROM users WHERE role = 2 AND valid = 1",
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json(result[0]);
+    }
+  );
+});
+
+// ************************* Password Reset (Public) *****************************
 
 // Email transporter configuration
 const createTransporter = () => {
@@ -1204,4 +1311,5 @@ const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`JWT authentication enabled`);
 });

@@ -172,8 +172,8 @@
 
 .admin-form__input:focus {
   outline: none;
-  border-color: #4f6bed;
-  box-shadow: 0 0 0 3px rgba(79, 107, 237, 0.1);
+  border-color: #a65b43;
+  box-shadow: 0 0 0 3px rgba(166, 91, 67, 0.1);
 }
 
 .admin-form__select {
@@ -189,14 +189,14 @@
 
 .admin-form__select:focus {
   outline: none;
-  border-color: #4f6bed;
-  box-shadow: 0 0 0 3px rgba(79, 107, 237, 0.1);
+  border-color: #a65b43;
+  box-shadow: 0 0 0 3px rgba(166, 91, 67, 0.1);
 }
 
 .admin-form__submit {
   width: 100%;
   padding: 0.875rem;
-  background: #4f6bed;
+  background: #a65b43;
   color: white;
   border: none;
   border-radius: 8px;
@@ -208,7 +208,7 @@
 }
 
 .admin-form__submit:hover:not(:disabled) {
-  background: #3b5bdb;
+  background: #8b4a36;
 }
 
 .admin-form__submit:disabled {

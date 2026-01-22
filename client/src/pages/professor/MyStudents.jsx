@@ -130,7 +130,7 @@ const MyStudents = () => {
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              color: '#4f6bed',
+              color: '#a65b43',
               padding: '0.25rem'
             }}
             title="Définir la date"

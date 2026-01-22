@@ -138,8 +138,8 @@
 
 .professor-form__input:focus {
   outline: none;
-  border-color: #4f6bed;
-  box-shadow: 0 0 0 3px rgba(79, 107, 237, 0.1);
+  border-color: #a65b43;
+  box-shadow: 0 0 0 3px rgba(166, 91, 67, 0.1);
 }
 
 .professor-form__textarea {
@@ -157,8 +157,8 @@
 
 .professor-form__textarea:focus {
   outline: none;
-  border-color: #4f6bed;
-  box-shadow: 0 0 0 3px rgba(79, 107, 237, 0.1);
+  border-color: #a65b43;
+  box-shadow: 0 0 0 3px rgba(166, 91, 67, 0.1);
 }
 
 .professor-form__select {
@@ -174,8 +174,8 @@
 
 .professor-form__select:focus {
   outline: none;
-  border-color: #4f6bed;
-  box-shadow: 0 0 0 3px rgba(79, 107, 237, 0.1);
+  border-color: #a65b43;
+  box-shadow: 0 0 0 3px rgba(166, 91, 67, 0.1);
 }
 
 .professor-form__checkbox-group {
@@ -202,12 +202,12 @@
 }
 
 .professor-form__checkbox-label input:checked + span {
-  color: #4f6bed;
+  color: #a65b43;
   font-weight: 500;
 }
 
 .professor-form__checkbox-label input {
-  accent-color: #4f6bed;
+  accent-color: #a65b43;
 }
 
 .professor-form__actions {
@@ -220,7 +220,7 @@
 
 .professor-form__submit {
   padding: 0.875rem 1.5rem;
-  background: #4f6bed;
+  background: #a65b43;
   color: white;
   border: none;
   border-radius: 8px;
@@ -231,7 +231,7 @@
 }
 
 .professor-form__submit:hover:not(:disabled) {
-  background: #3b5bdb;
+  background: #8b4a36;
 }
 
 .professor-form__submit:disabled {

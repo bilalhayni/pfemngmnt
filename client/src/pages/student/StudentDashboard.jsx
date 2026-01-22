@@ -44,7 +44,7 @@ const StudentDashboard = () => {
       value: stats.availablePfes,
       subtitle: 'Projets à postuler',
       icon: 'all-projects',
-      iconBgColor: '#4f6bed'
+      iconBgColor: '#a65b43'
     },
     {
       title: 'Mes Postulations',
@@ -91,7 +91,7 @@ const StudentDashboard = () => {
           <h3>Actions Rapides</h3>
           <div className="student-dashboard__actions-grid">
             <a href="/student/pfe" className="student-action-card">
-              <div className="student-action-card__icon" style={{ backgroundColor: '#4f6bed' }}>
+              <div className="student-action-card__icon" style={{ backgroundColor: '#a65b43' }}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
                   <line x1="8" y1="21" x2="16" y2="21" />

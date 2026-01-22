@@ -41,7 +41,7 @@ const StatCard = ({ title, value, subtitle, icon, iconBgColor }) => {
         <span className="stat-card__title">{title}</span>
         <div
           className="stat-card__icon"
-          style={{ backgroundColor: iconBgColor || '#4f6bed' }}
+          style={{ backgroundColor: iconBgColor || '#a65b43' }}
         >
           {renderIcon()}
         </div>

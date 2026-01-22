@@ -76,7 +76,7 @@ const SignUpForm = () => {
         icon: 'error',
         title: 'Erreur',
         text: 'Les mots de passe ne correspondent pas',
-        confirmButtonColor: '#4f6bed'
+        confirmButtonColor: '#a65b43'
       });
       return;
     }
@@ -87,7 +87,7 @@ const SignUpForm = () => {
         icon: 'error',
         title: 'Erreur',
         text: 'Vous devez accepter les conditions d\'utilisation',
-        confirmButtonColor: '#4f6bed'
+        confirmButtonColor: '#a65b43'
       });
       return;
     }
@@ -117,7 +117,7 @@ const SignUpForm = () => {
         icon: 'success',
         title: 'Inscription réussie!',
         text: 'Votre compte a été créé. Veuillez attendre l\'activation par l\'administrateur.',
-        confirmButtonColor: '#4f6bed'
+        confirmButtonColor: '#a65b43'
       }).then(() => {
         navigate('/login');
       });
@@ -126,7 +126,7 @@ const SignUpForm = () => {
         icon: 'error',
         title: 'Erreur d\'inscription',
         text: result.error,
-        confirmButtonColor: '#4f6bed'
+        confirmButtonColor: '#a65b43'
       });
     }
   };
