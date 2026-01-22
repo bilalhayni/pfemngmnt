@@ -1,0 +1,263 @@
+// Mixins - Reusable style patterns
+// =============================================================================
+
+@use 'sass:map';
+
+// Breakpoints map
+$breakpoints: (
+  'sm': 640px,
+  'md': 768px,
+  'lg': 1024px,
+  'xl': 1280px
+);
+
+// =============================================================================
+// Responsive Breakpoints
+// =============================================================================
+
+// Mobile-first breakpoint (min-width)
+@mixin breakpoint($size) {
+  @if map.has-key($breakpoints, $size) {
+    @media (min-width: map.get($breakpoints, $size)) {
+      @content;
+    }
+  } @else {
+    @media (min-width: $size) {
+      @content;
+    }
+  }
+}
+
+// Desktop-first breakpoint (max-width)
+@mixin breakpoint-down($size) {
+  @if map.has-key($breakpoints, $size) {
+    @media (max-width: #{map.get($breakpoints, $size) - 1px}) {
+      @content;
+    }
+  } @else {
+    @media (max-width: #{$size - 1px}) {
+      @content;
+    }
+  }
+}
+
+// =============================================================================
+// Flexbox Helpers
+// =============================================================================
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// =============================================================================
+// Typography
+// =============================================================================
+
+@mixin heading($size: 'base') {
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+
+  @if $size == '3xl' {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+  } @else if $size == '2xl' {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+  } @else if $size == 'xl' {
+    font-size: var(--font-size-xl);
+  } @else if $size == 'lg' {
+    font-size: var(--font-size-lg);
+  } @else if $size == 'md' {
+    font-size: var(--font-size-md);
+  } @else {
+    font-size: var(--font-size-base);
+  }
+}
+
+@mixin truncate($lines: 1) {
+  @if $lines == 1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+// =============================================================================
+// Visual Effects
+// =============================================================================
+
+@mixin card {
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+@mixin hover-lift {
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+// =============================================================================
+// Buttons
+// =============================================================================
+
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-primary {
+  @include button-base;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-primary-dark);
+  }
+}
+
+@mixin button-secondary {
+  @include button-base;
+  background-color: var(--bg-secondary);
+  color: var(--color-gray-700);
+  border: 1px solid var(--border-color);
+
+  &:hover:not(:disabled) {
+    background-color: var(--bg-tertiary);
+  }
+}
+
+// =============================================================================
+// Form Elements
+// =============================================================================
+
+@mixin input-base {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-primary);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+  }
+
+  &::placeholder {
+    color: var(--color-gray-400);
+  }
+
+  &:disabled {
+    background-color: var(--bg-tertiary);
+    cursor: not-allowed;
+  }
+}
+
+// =============================================================================
+// Scrollbar
+// =============================================================================
+
+@mixin custom-scrollbar($width: 6px) {
+  &::-webkit-scrollbar {
+    width: $width;
+    height: $width;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-gray-300);
+    border-radius: #{$width / 2};
+
+    &:hover {
+      background-color: var(--color-gray-400);
+    }
+  }
+}
+
+// =============================================================================
+// Animations
+// =============================================================================
+
+@mixin fade-in($duration: 0.3s) {
+  animation: fadeIn $duration ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@mixin slide-up($duration: 0.3s) {
+  animation: slideUp $duration ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

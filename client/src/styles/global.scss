@@ -1,0 +1,103 @@
+// Global Styles - Main entry point
+// =============================================================================
+
+// Import partials (order matters)
+@use 'variables';
+@use 'reset';
+@use 'mixins' as *;
+@use 'typography';
+@use 'utilities';
+
+// =============================================================================
+// Global Styles
+// =============================================================================
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-black);
+  background-color: var(--bg-secondary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  @include custom-scrollbar;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+// Selection
+::selection {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+// Focus Styles
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+// Links
+a {
+  color: var(--color-primary);
+  transition: color var(--transition-fast);
+
+  &:hover {
+    color: var(--color-primary-dark);
+  }
+}
+
+// Images
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+// =============================================================================
+// Third-party Customization
+// =============================================================================
+
+// SweetAlert2
+.swal2-popup {
+  font-family: var(--font-family) !important;
+  border-radius: var(--radius-xl) !important;
+}
+
+.swal2-title {
+  color: var(--color-black) !important;
+}
+
+.swal2-html-container {
+  color: var(--color-gray-600) !important;
+}
+
+.swal2-confirm {
+  border-radius: var(--radius-lg) !important;
+}
+
+.swal2-cancel {
+  border-radius: var(--radius-lg) !important;
+}
+
+// =============================================================================
+// Responsive Adjustments
+// =============================================================================
+
+@include breakpoint-down('md') {
+  html {
+    font-size: 15px;
+  }
+}
+
+@include breakpoint-down('sm') {
+  html {
+    font-size: 14px;
+  }
+}
