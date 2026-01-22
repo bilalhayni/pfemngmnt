@@ -1,16 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Swal from 'sweetalert2';
 import MultiStepForm from './MultiStepForm';
+import filiereService from '../../services/api/filiere.service';
 import './SignUpForm.css';
 
 const SignUpForm = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [departments, setDepartments] = useState([]);
+  const [isLoadingDepartments, setIsLoadingDepartments] = useState(true);
 
-  const steps = [
+  // Fetch departments from backend
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await filiereService.getAll();
+        if (response?.data) {
+          // Transform backend data to options format { value, label }
+          const options = response.data.map(dep => ({
+            value: dep.idFiliere.toString(),
+            label: dep.name
+          }));
+          setDepartments(options);
+        }
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+        // Set empty array if fetch fails - form will show empty dropdown
+        setDepartments([]);
+      } finally {
+        setIsLoadingDepartments(false);
+      }
+    };
+    fetchDepartments();
+  }, []);
+
+  const steps = useMemo(() => [
     {
       title: 'Informations personnelles',
       description: 'Commençons par vos informations de base',
@@ -37,13 +64,8 @@ const SignUpForm = () => {
           label: 'Département',
           type: 'select',
           required: true,
-          options: [
-            { value: 'informatique', label: 'Informatique' },
-            { value: 'mathematiques', label: 'Mathématiques' },
-            { value: 'physique', label: 'Physique' },
-            { value: 'chimie', label: 'Chimie' },
-            { value: 'biologie', label: 'Biologie' }
-          ]
+          placeholder: isLoadingDepartments ? 'Chargement...' : 'Sélectionner un département',
+          options: departments
         },
         { name: 'cne', label: 'CNE', placeholder: 'Votre CNE', required: true },
         { name: 'cin', label: 'CIN', placeholder: 'Votre CIN', required: true }
@@ -59,7 +81,7 @@ const SignUpForm = () => {
         { name: 'newsletter', type: 'checkbox', checkboxLabel: 'Recevoir les notifications par email', fullWidth: true }
       ]
     }
-  ];
+  ], [departments, isLoadingDepartments]);
 
   const handleSubmit = async (formData) => {
     if (isSubmitting) return;
