@@ -7,8 +7,8 @@
  * @deprecated Import from './api' instead
  */
 
-export {
-  apiClient as default,
+// Import everything from the api module
+import apiClient, {
   authService,
   pfeService,
   professorService,
@@ -23,3 +23,23 @@ export {
   adminService,
   chefDepartementService
 } from './api';
+
+// Re-export everything
+export {
+  authService,
+  pfeService,
+  professorService,
+  professorPortalService,
+  studentService,
+  domainService,
+  prerequisiteService,
+  filiereService,
+  demandeService,
+  postulationService,
+  statsService,
+  adminService,
+  chefDepartementService
+};
+
+// Default export is the API client
+export default apiClient;
