@@ -1,21 +1,61 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout } from '../components/layout';
 import { DataTable, PageHeader, StatCard } from '../components/common';
+import { useAuth } from '../context/AuthContext';
+import { chefDepartementService } from '../services/api';
 import './TousLesPfes.css';
 
 const TousLesPfes = () => {
+  const { user } = useAuth();
+  const [pfes, setPfes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const userName = user?.firstName
+    ? `${user.firstName} ${user.lastName || ''}`
+    : 'Chef';
+  const userInitials = user?.firstName
+    ? `${user.firstName[0]}${user.lastName?.[0] || ''}`
+    : 'CH';
+
+  useEffect(() => {
+    const fetchAllPfes = async () => {
+      if (!user?.idFiliere) return;
+
+      setLoading(true);
+      try {
+        const response = await chefDepartementService.getAllPfes(user.idFiliere);
+        if (response?.data) {
+          const formattedData = response.data.map(pfe => ({
+            id: pfe.id,
+            title: pfe.titre || 'Sans titre',
+            supervisor: pfe.fname || 'N/A',
+            supervisorInitials: pfe.fname
+              ? pfe.fname.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+              : 'NA',
+            nbStudents: pfe.nbr_etd || 1,
+            status: pfe.avancement || 'En cours',
+            description: pfe.description || ''
+          }));
+          setPfes(formattedData);
+        }
+      } catch (error) {
+        console.error('Error fetching PFEs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllPfes();
+  }, [user]);
+
+  // Calculate stats
+  const totalPfes = pfes.length;
+  const enCours = pfes.filter(p => p.status === 'En cours').length;
+  const termines = pfes.filter(p => p.status === 'Terminé').length;
+  const uniqueSupervisors = [...new Set(pfes.map(p => p.supervisor))].length;
+
   const columns = [
     { key: 'title', label: 'Titre du PFE' },
-    {
-      key: 'student',
-      label: 'Étudiant',
-      render: (value, row) => (
-        <div className="table-avatar">
-          <div className="table-avatar__image">{row.studentInitials}</div>
-          <span className="table-avatar__name">{value}</span>
-        </div>
-      )
-    },
     {
       key: 'supervisor',
       label: 'Encadrant',
@@ -26,19 +66,7 @@ const TousLesPfes = () => {
         </div>
       )
     },
-    { key: 'domain', label: 'Domaine' },
-    {
-      key: 'progress',
-      label: 'Avancement',
-      render: (value) => (
-        <div className="progress-bar-container">
-          <div className="progress-bar">
-            <div className="progress-bar__fill" style={{ width: `${value}%` }}></div>
-          </div>
-          <span className="progress-bar__text">{value}%</span>
-        </div>
-      )
-    },
+    { key: 'nbStudents', label: 'Nb. Étudiants' },
     {
       key: 'status',
       label: 'Statut',
@@ -64,36 +92,39 @@ const TousLesPfes = () => {
     }
   ];
 
-  const data = [
-    { id: 1, title: 'Système de gestion des PFE', student: 'Hamza El Amrani', studentInitials: 'HE', supervisor: 'Dr. Ahmed Benali', supervisorInitials: 'AB', domain: 'Développement Web', progress: 75, status: 'En cours' },
-    { id: 2, title: 'Application mobile de santé', student: 'Sara Bennani', studentInitials: 'SB', supervisor: 'Dr. Fatima Zahra', supervisorInitials: 'FZ', domain: 'Mobile', progress: 45, status: 'En cours' },
-    { id: 3, title: 'Plateforme e-learning IA', student: 'Omar Idrissi', studentInitials: 'OI', supervisor: 'Dr. Mohamed Tazi', supervisorInitials: 'MT', domain: 'IA', progress: 100, status: 'Terminé' },
-    { id: 4, title: 'Chatbot intelligent', student: 'Nadia Chraibi', studentInitials: 'NC', supervisor: 'Dr. Ahmed Benali', supervisorInitials: 'AB', domain: 'NLP', progress: 30, status: 'En cours' },
-    { id: 5, title: 'Système de recommandation', student: 'Yassine Berrada', studentInitials: 'YB', supervisor: 'Dr. Mohamed Tazi', supervisorInitials: 'MT', domain: 'Machine Learning', progress: 100, status: 'Terminé' },
-    { id: 6, title: 'Analyse de sentiments', student: 'Laila Fassi', studentInitials: 'LF', supervisor: 'Dr. Khadija Alami', supervisorInitials: 'KA', domain: 'NLP', progress: 60, status: 'En cours' },
-    { id: 7, title: 'Application IoT Smart Home', student: 'Rachid Amrani', studentInitials: 'RA', supervisor: 'Dr. Youssef Mansouri', supervisorInitials: 'YM', domain: 'IoT', progress: 20, status: 'En cours' },
-    { id: 8, title: 'Détection de fraude bancaire', student: 'Salma Kettani', studentInitials: 'SK', supervisor: 'Dr. Mohamed Tazi', supervisorInitials: 'MT', domain: 'Data Science', progress: 85, status: 'En cours' }
-  ];
+  if (loading) {
+    return (
+      <Layout pageTitle="Tous les PFE's" userName={userName} userInitials={userInitials}>
+        <div className="loading-container">Chargement...</div>
+      </Layout>
+    );
+  }
 
   return (
-    <Layout pageTitle="Tous les PFE's" userName="Chef" userInitials="CH">
+    <Layout pageTitle="Tous les PFE's" userName={userName} userInitials={userInitials}>
       <PageHeader
         title="Tous les PFE's"
-        subtitle="Vue d'ensemble de tous les projets de fin d'études du département"
+        subtitle="Vue d'ensemble de tous les projets de fin d'études de la filière"
       />
 
       <div className="stats-row">
-        <StatCard title="Total PFEs" value="8" subtitle="Tous projets" color="blue" icon="folder" />
-        <StatCard title="En cours" value="6" subtitle="Projets actifs" color="green" icon="progress" />
-        <StatCard title="Terminés" value="2" subtitle="Projets complétés" color="purple" icon="check" />
-        <StatCard title="Encadrants" value="5" subtitle="Professeurs actifs" color="yellow" icon="professors" />
+        <StatCard title="Total PFEs" value={totalPfes} subtitle="Tous projets" icon="folder" iconBgColor="#4f6bed" />
+        <StatCard title="En cours" value={enCours} subtitle="Projets actifs" icon="progress" iconBgColor="#10b981" />
+        <StatCard title="Terminés" value={termines} subtitle="Projets complétés" icon="check" iconBgColor="#8b5cf6" />
+        <StatCard title="Encadrants" value={uniqueSupervisors} subtitle="Professeurs actifs" icon="professors" iconBgColor="#f59e0b" />
       </div>
 
-      <DataTable
-        columns={columns}
-        data={data}
-        searchPlaceholder="Rechercher un PFE..."
-      />
+      {pfes.length === 0 ? (
+        <div className="empty-state">
+          <p>Aucun PFE trouvé dans votre filière.</p>
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={pfes}
+          searchPlaceholder="Rechercher un PFE..."
+        />
+      )}
     </Layout>
   );
 };
