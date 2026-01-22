@@ -25,15 +25,16 @@ export const navigationConfig = {
  */
 export const professorNavigationConfig = {
   principal: [
-    { path: '/prof/home', label: "Page d'accueil", icon: 'home' }
+    { path: '/prof/home', label: "Dashboard", icon: 'home' }
   ],
   listes: [
-    { path: '/prof/student', label: 'Étudiants-es', icon: 'students' },
-    { path: '/prof/pfe', label: "Mes PFE's", icon: 'folder' }
+    { path: '/prof/pfe', label: "Mes PFEs", icon: 'folder' },
+    { path: '/prof/demandes', label: 'Demandes', icon: 'requests' },
+    { path: '/prof/students', label: 'Mes Étudiants', icon: 'students' }
   ],
   utile: [
-    { path: '/prof/demandes', label: 'Demandes', icon: 'requests' },
-    { path: '/prof/domaine', label: 'Domaines PFE', icon: 'domains' }
+    { path: '/prof/pfe/new', label: 'Créer un PFE', icon: 'add' },
+    { path: '/prof/profile', label: 'Mon Profil', icon: 'students' }
   ]
 };
 
