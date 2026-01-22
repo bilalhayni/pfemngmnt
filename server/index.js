@@ -183,7 +183,24 @@ app.get("/prerequi", (req, res) => {
 
 // Register new student
 app.post("/registerStudent", async (req, res) => {
-  const { filiere, firstName, lastName, phone, email, password, role, idPrerequisites } = req.body;
+  // Accept both 'department' (from frontend) and 'filiere' (legacy) for the department field
+  const {
+    department,
+    filiere,
+    firstName,
+    lastName,
+    phone,
+    email,
+    password,
+    role,
+    cne,
+    cin,
+    dateNaissance,
+    idPrerequisites
+  } = req.body;
+
+  // Use department if provided, otherwise fall back to filiere
+  const idFiliere = department || filiere;
 
   db.query("SELECT id FROM users WHERE email = ?", [email], (err, result) => {
     if (err) {
@@ -195,8 +212,8 @@ app.post("/registerStudent", async (req, res) => {
     }
 
     db.query(
-      "INSERT INTO users (email, password, firstName, lastName, idFiliere, phone, role, valid) VALUES (?, ?, ?, ?, ?, ?, ?, 0)",
-      [email, password, firstName, lastName, filiere, phone, role],
+      "INSERT INTO users (email, password, firstName, lastName, idFiliere, phone, role, valid, cne, cin, dateNaissance) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)",
+      [email, password, firstName, lastName, idFiliere, phone, role, cne || null, cin || null, dateNaissance || null],
       (err, result) => {
         if (err) {
           return res.status(500).json({ error: "Registration failed" });
