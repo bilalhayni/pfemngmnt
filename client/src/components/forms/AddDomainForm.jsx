@@ -17,7 +17,7 @@ const AddDomainForm = ({ onSubmit, onCancel }) => {
           type: 'select',
           required: true,
           options: [
-            { value: '#4f6bed', label: 'Bleu' },
+            { value: '#a65b43', label: 'Bleu' },
             { value: '#22c55e', label: 'Vert' },
             { value: '#f59e0b', label: 'Orange' },
             { value: '#8b5cf6', label: 'Violet' },

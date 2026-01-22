@@ -129,8 +129,8 @@
 
 .inline-form input:focus {
   outline: none;
-  border-color: #4f6bed;
-  box-shadow: 0 0 0 3px rgba(79, 107, 237, 0.1);
+  border-color: #a65b43;
+  box-shadow: 0 0 0 3px rgba(166, 91, 67, 0.1);
 }
 
 .btn {
@@ -144,12 +144,12 @@
 }
 
 .btn--primary {
-  background-color: #4f6bed;
+  background-color: #a65b43;
   color: white;
 }
 
 .btn--primary:hover:not(:disabled) {
-  background-color: #3b5bdb;
+  background-color: #8b4a36;
 }
 
 .btn--primary:disabled {

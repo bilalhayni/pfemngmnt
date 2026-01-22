@@ -1,13 +1,18 @@
 :root {
-  /* Primary Colors */
-  --color-primary: #4f6bed;
-  --color-primary-dark: #3b5bdb;
-  --color-primary-light: #eef2ff;
+  /* Primary Colors - Main brand color */
+  --color-primary: #a65b43;
+  --color-primary-dark: #8b4a36;
+  --color-primary-light: #fdf2ef;
+  --color-primary-rgb: 166, 91, 67;
 
   /* Secondary Colors */
   --color-secondary: #6b7280;
   --color-secondary-dark: #4b5563;
   --color-secondary-light: #f3f4f6;
+
+  /* Accent Colors */
+  --color-accent: #a65b43;
+  --color-accent-hover: #8b4a36;
 
   /* Status Colors */
   --color-success: #22c55e;

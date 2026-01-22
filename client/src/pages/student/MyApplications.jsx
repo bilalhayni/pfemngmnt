@@ -120,7 +120,7 @@ const MyApplications = () => {
             <line x1="9" y1="15" x2="12" y2="15" />
           </svg>
           <p>Vous n'avez pas encore postulé à un PFE</p>
-          <a href="/student/pfe" style={{ marginTop: '1rem', color: '#4f6bed', textDecoration: 'none' }}>
+          <a href="/student/pfe" style={{ marginTop: '1rem', color: '#a65b43', textDecoration: 'none' }}>
             Parcourir les PFEs disponibles
           </a>
         </div>

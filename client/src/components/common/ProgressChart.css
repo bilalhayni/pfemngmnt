@@ -34,7 +34,7 @@
 .progress-chart__icon svg {
   width: 18px;
   height: 18px;
-  color: #4f6bed;
+  color: #a65b43;
 }
 
 .progress-chart__title {
@@ -46,7 +46,7 @@
 
 .progress-chart__link {
   font-size: 14px;
-  color: #4f6bed;
+  color: #a65b43;
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -55,7 +55,7 @@
 }
 
 .progress-chart__link:hover {
-  color: #3b5bdb;
+  color: #8b4a36;
 }
 
 /* Content */

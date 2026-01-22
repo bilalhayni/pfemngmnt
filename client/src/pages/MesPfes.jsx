@@ -141,7 +141,7 @@ const MesPfes = () => {
       />
 
       <div className="stats-row">
-        <StatCard title="Total PFEs" value={totalPfes} subtitle="Projets encadrés" icon="folder" iconBgColor="#4f6bed" />
+        <StatCard title="Total PFEs" value={totalPfes} subtitle="Projets encadrés" icon="folder" iconBgColor="#a65b43" />
         <StatCard title="En cours" value={enCours} subtitle="Projets actifs" icon="progress" iconBgColor="#10b981" />
         <StatCard title="Terminés" value={termines} subtitle="Projets complétés" icon="check" iconBgColor="#8b5cf6" />
       </div>

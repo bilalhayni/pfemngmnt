@@ -48,7 +48,7 @@ const LoginForm = () => {
         icon: 'error',
         title: 'Erreur',
         text: result.error,
-        confirmButtonColor: '#4f6bed'
+        confirmButtonColor: '#a65b43'
       });
     }
   };
@@ -62,7 +62,7 @@ const LoginForm = () => {
       showCancelButton: true,
       confirmButtonText: 'Envoyer',
       cancelButtonText: 'Annuler',
-      confirmButtonColor: '#4f6bed',
+      confirmButtonColor: '#a65b43',
       inputValidator: (value) => {
         if (!value) {
           return 'Veuillez entrer votre email';
@@ -80,14 +80,14 @@ const LoginForm = () => {
           icon: 'success',
           title: 'Email envoyé',
           text: `Le mot de passe a été envoyé à: ${emailInput}`,
-          confirmButtonColor: '#4f6bed'
+          confirmButtonColor: '#a65b43'
         });
       } else {
         Swal.fire({
           icon: 'error',
           title: 'Erreur',
           text: result.error,
-          confirmButtonColor: '#4f6bed'
+          confirmButtonColor: '#a65b43'
         });
       }
     }

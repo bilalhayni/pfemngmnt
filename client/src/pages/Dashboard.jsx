@@ -69,7 +69,7 @@ const Dashboard = () => {
       value: stats?.professorsCount ?? 0,
       subtitle: 'Membres actifs',
       icon: 'professors',
-      iconBgColor: '#4f6bed'
+      iconBgColor: '#a65b43'
     },
     {
       title: 'Étudiants',
@@ -90,7 +90,7 @@ const Dashboard = () => {
       value: stats?.domainsCount ?? 0,
       subtitle: 'Spécialités PFE',
       icon: 'domains',
-      iconBgColor: '#4f6bed'
+      iconBgColor: '#a65b43'
     }
   ];
 
@@ -98,7 +98,7 @@ const Dashboard = () => {
   const getChartData = (pfeStatsData) => {
     const colorMap = {
       'En cours': '#10b981',
-      'Terminé': '#4f6bed',
+      'Terminé': '#a65b43',
       'En attente': '#f59e0b'
     };
 
