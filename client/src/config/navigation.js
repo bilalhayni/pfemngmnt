@@ -61,13 +61,16 @@ export const adminNavigationConfig = {
  */
 export const studentNavigationConfig = {
   principal: [
-    { path: '/student/home', label: "Page d'accueil", icon: 'home' }
+    { path: '/student/home', label: "Dashboard", icon: 'home' }
   ],
   listes: [
-    { path: '/student/pfe', label: "Tous les PFE's", icon: 'all-projects' },
+    { path: '/student/pfe', label: "Parcourir les PFEs", icon: 'all-projects' },
+    { path: '/student/applications', label: "Mes Postulations", icon: 'requests' },
     { path: '/student/mypfe', label: "Mon PFE", icon: 'folder' }
   ],
-  utile: []
+  utile: [
+    { path: '/student/profile', label: "Mon Profil", icon: 'students' }
+  ]
 };
 
 /**
