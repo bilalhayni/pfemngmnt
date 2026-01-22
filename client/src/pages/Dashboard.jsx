@@ -3,13 +3,14 @@ import Layout from '../components/layout/Layout';
 import StatCard from '../components/common/StatCard';
 import ProgressChart from '../components/common/ProgressChart';
 import { useAuth } from '../context/AuthContext';
-import { statsService, pfeService } from '../services/api';
+import { chefDepartementService } from '../services/api';
 import './Dashboard.css';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
-  const [pfeStats, setPfeStats] = useState(null);
+  const [myPfeStats, setMyPfeStats] = useState([]);
+  const [allPfeStats, setAllPfeStats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -24,27 +25,32 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      if (!user?.idFiliere) return;
+
       setLoading(true);
       setError(null);
 
       try {
-        // Fetch dashboard stats and PFE data in parallel
-        const [dashboardResponse, pfeResponse] = await Promise.all([
-          statsService.getDashboard().catch(() => null),
-          pfeService.getAll().catch(() => null)
+        // Fetch dashboard stats and PFE progress data in parallel
+        const [statsResponse, myPfeResponse, allPfeResponse] = await Promise.all([
+          chefDepartementService.getStats(user.idFiliere).catch(() => null),
+          chefDepartementService.getMyPfeStats(user.id).catch(() => null),
+          chefDepartementService.getAllPfeStats(user.idFiliere).catch(() => null)
         ]);
 
         // Process dashboard stats
-        if (dashboardResponse?.data) {
-          setStats(dashboardResponse.data);
+        if (statsResponse?.data) {
+          setStats(statsResponse.data);
         }
 
-        // Process PFE data for charts
-        if (pfeResponse?.data) {
-          const pfes = Array.isArray(pfeResponse.data) ? pfeResponse.data : [];
-          const inProgress = pfes.filter(pfe => pfe.status === 'en_cours' || pfe.progress < 100).length;
-          const completed = pfes.filter(pfe => pfe.status === 'termine' || pfe.progress === 100).length;
-          setPfeStats({ inProgress, completed, total: pfes.length });
+        // Process my PFE stats for charts
+        if (myPfeResponse?.data) {
+          setMyPfeStats(Array.isArray(myPfeResponse.data) ? myPfeResponse.data : []);
+        }
+
+        // Process all PFE stats for charts
+        if (allPfeResponse?.data) {
+          setAllPfeStats(Array.isArray(allPfeResponse.data) ? allPfeResponse.data : []);
         }
       } catch (err) {
         setError('Erreur lors du chargement des données');
@@ -54,7 +60,7 @@ const Dashboard = () => {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [user]);
 
   // Stats cards data - use API data or fallback to 0
   const statsCards = [
@@ -74,7 +80,7 @@ const Dashboard = () => {
     },
     {
       title: 'Projets PFE',
-      value: stats?.pfesCount ?? pfeStats?.total ?? 0,
+      value: stats?.pfesCount ?? 0,
       subtitle: 'Actifs & terminés',
       icon: 'projects',
       iconBgColor: '#10b981'
@@ -88,16 +94,23 @@ const Dashboard = () => {
     }
   ];
 
-  // PFE chart data
-  const myPfeData = [
-    { label: 'En cours', value: pfeStats?.inProgress ?? 0, color: '#10b981' },
-    { label: 'Terminés', value: pfeStats?.completed ?? 0, color: '#4f6bed' }
-  ];
+  // Convert PFE stats to chart format
+  const getChartData = (pfeStatsData) => {
+    const colorMap = {
+      'En cours': '#10b981',
+      'Terminé': '#4f6bed',
+      'En attente': '#f59e0b'
+    };
 
-  const allPfeData = [
-    { label: 'En cours', value: pfeStats?.inProgress ?? 0, color: '#10b981' },
-    { label: 'Terminés', value: pfeStats?.completed ?? 0, color: '#4f6bed' }
-  ];
+    return pfeStatsData.map(stat => ({
+      label: stat.avancement,
+      value: stat.num,
+      color: colorMap[stat.avancement] || '#94a3b8'
+    }));
+  };
+
+  const myPfeData = getChartData(myPfeStats);
+  const allPfeData = getChartData(allPfeStats);
 
   return (
     <Layout pageTitle="Dashboard" userName={userName} userEmail={userEmail} userInitials={userInitials}>
@@ -140,13 +153,13 @@ const Dashboard = () => {
             title="Mes PFE's - Avancement"
             linkText="Voir tous"
             linkHref="/mes-pfes"
-            data={myPfeData}
+            data={myPfeData.length > 0 ? myPfeData : [{ label: 'Aucun', value: 0, color: '#94a3b8' }]}
           />
           <ProgressChart
             title="Tous les PFE's - Avancement"
             linkText="Voir tous"
             linkHref="/tous-les-pfes"
-            data={allPfeData}
+            data={allPfeData.length > 0 ? allPfeData : [{ label: 'Aucun', value: 0, color: '#94a3b8' }]}
           />
         </div>
       </div>
