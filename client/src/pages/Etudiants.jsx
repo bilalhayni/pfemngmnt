@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/layout';
 import { DataTable, PageHeader } from '../components/common';
 import { useAuth } from '../context/AuthContext';
@@ -7,6 +8,7 @@ import './Etudiants.css';
 
 const Etudiants = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -77,7 +79,11 @@ const Etudiants = () => {
       sortable: false,
       render: (_, row) => (
         <div className="table-actions">
-          <button className="table-action-btn table-action-btn--view" title="Voir">
+          <button
+            className="table-action-btn table-action-btn--view"
+            title="Voir le profil"
+            onClick={() => navigate(`/users/${row.id}`)}
+          >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
               <circle cx="12" cy="12" r="3" />
