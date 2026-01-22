@@ -26,17 +26,11 @@ const SignUpForm = () => {
       description: 'Parlez-nous de votre parcours',
       fields: [
         {
-          name: 'prerequis',
-          label: 'Prequis',
-          type: 'select',
+          name: 'dateNaissance',
+          label: 'Date de naissance',
+          type: 'date',
           required: true,
-          options: [
-            { value: 'programmation', label: 'Programmation' },
-            { value: 'base_de_donnees', label: 'Base de données' },
-            { value: 'reseaux', label: 'Réseaux' },
-            { value: 'mathematiques', label: 'Mathématiques' },
-            { value: 'systemes', label: 'Systèmes d\'exploitation' }
-          ]
+          hint: 'Format: JJ/MM/AAAA'
         },
         {
           name: 'department',
@@ -105,7 +99,7 @@ const SignUpForm = () => {
       cin: formData.cin,
       department: formData.department,
       role: 2, // Student role only
-      prerequis: formData.prerequis
+      dateNaissance: formData.dateNaissance
     };
 
     const result = await register(registrationData);
