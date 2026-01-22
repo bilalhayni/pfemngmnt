@@ -861,6 +861,48 @@ app.delete("/deleteDemande/:id", (req, res) => {
   });
 });
 
+// ************************* Student Portal Stats *****************************
+
+// Student dashboard stats
+app.get("/student/stats", (req, res) => {
+  const userId = req.query.userId;
+  const filId = req.query.filId;
+
+  const stats = {
+    availablePfes: 0,
+    myApplications: 0,
+    assignedPfe: false
+  };
+
+  let completed = 0;
+  const total = 3;
+
+  const checkComplete = () => {
+    completed++;
+    if (completed === total) {
+      res.json(stats);
+    }
+  };
+
+  // Count available PFEs in student's filiere
+  db.query("SELECT COUNT(*) as count FROM pfe WHERE idFiliere = ?", [filId], (err, result) => {
+    if (!err && result[0]) stats.availablePfes = result[0].count;
+    checkComplete();
+  });
+
+  // Count pending applications
+  db.query("SELECT COUNT(*) as count FROM demandes WHERE id_user = ? AND dispo = 0", [userId], (err, result) => {
+    if (!err && result[0]) stats.myApplications = result[0].count;
+    checkComplete();
+  });
+
+  // Check if student has assigned PFE
+  db.query("SELECT COUNT(*) as count FROM demandes WHERE id_user = ? AND dispo = 1", [userId], (err, result) => {
+    if (!err && result[0]) stats.assignedPfe = result[0].count > 0;
+    checkComplete();
+  });
+});
+
 // ************************* Statistics *****************************
 
 // Get professor count by filiere (for admin charts)

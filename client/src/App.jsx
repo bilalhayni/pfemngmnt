@@ -29,6 +29,16 @@ import {
   CreateFiliere
 } from './pages/admin';
 
+// Student Pages
+import {
+  StudentDashboard,
+  ListAllPfe,
+  MyApplications,
+  MyPfe,
+  PfeDetails,
+  StudentProfile
+} from './pages/student';
+
 // Page Not Found
 import PageNotFound from './pages/PageNotFound';
 
@@ -82,10 +92,12 @@ function App() {
 
         {/* Student Routes (role === 2) */}
         <Route path="/student" element={<PrivateRouteStudent />}>
-          <Route path="home" element={<Dashboard />} />
-          <Route path="profile" element={<Dashboard />} />
-          <Route path="pfe" element={<TousLesPfes />} />
-          <Route path="mypfe" element={<MesPfes />} />
+          <Route path="home" element={<StudentDashboard />} />
+          <Route path="pfe" element={<ListAllPfe />} />
+          <Route path="pfe/:id" element={<PfeDetails />} />
+          <Route path="applications" element={<MyApplications />} />
+          <Route path="mypfe" element={<MyPfe />} />
+          <Route path="profile" element={<StudentProfile />} />
         </Route>
 
         {/* 404 Page */}

@@ -69,7 +69,19 @@ export const studentService = {
   update: (id, data) => api.put(`/etudiants/${id}`, data),
   delete: (id) => api.delete(`/etudiants/${id}`),
   activate: (id) => api.put(`/etudiants/${id}/activate`),
-  deactivate: (id) => api.put(`/etudiants/${id}/deactivate`)
+  deactivate: (id) => api.put(`/etudiants/${id}/deactivate`),
+
+  // Student portal specific
+  getStats: () => api.get('/student/stats'),
+  getProfile: (id) => api.get(`/profileStd/${id}`),
+  updateProfile: (data) => api.put('/updateProfile', data),
+  getAllPfes: (filiereId) => api.get(`/allPfeStd/${filiereId}`),
+  getPfeDetails: (id) => api.get(`/SinglePfe/${id}`),
+  getPfePrerequisites: (id) => api.get(`/prerequisPfe/${id}`),
+  getMyApplications: (userId) => api.get(`/pfeOfStd/${userId}`),
+  getMyPfe: (userId) => api.get(`/MypfeOfStd/${userId}`),
+  applyToPfe: (data) => api.post('/addDemande', data),
+  cancelApplication: (id) => api.delete(`/deleteDemande/${id}`)
 };
 
 // Domain Services
