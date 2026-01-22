@@ -40,15 +40,7 @@ const Navbar = () => {
     <nav className={`navbar ${isCollapsed ? 'navbar--collapsed' : ''}`} aria-label="Main navigation">
       <div className="navbar__header">
         <div className="navbar__logo">
-          <div className="navbar__logo-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <rect x="3" y="3" width="8" height="8" rx="2" />
-              <rect x="13" y="3" width="8" height="8" rx="2" />
-              <rect x="3" y="13" width="8" height="8" rx="2" />
-              <rect x="13" y="13" width="8" height="8" rx="2" />
-            </svg>
-          </div>
-          <span className="navbar__logo-text">PFE Manager</span>
+          <img src='/logo-fpn.svg' />
         </div>
         <button
           className="navbar__toggle"
