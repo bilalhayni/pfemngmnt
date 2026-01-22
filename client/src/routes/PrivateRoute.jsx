@@ -1,13 +1,20 @@
 import { Outlet, Navigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import { useAuth } from '../context/AuthContext';
 import { Loading } from '../components/common';
 
 /**
- * Protected route for Chef Département (role === 1)
- * Uses AuthContext instead of accessing cookies directly
+ * Unified Protected Route Component
+ * Handles authentication and role-based authorization for all user types
+ *
+ * @param {number|number[]|null} allowedRoles - Role(s) allowed to access the route
+ *   - null/undefined: Any authenticated user can access
+ *   - number: Single role allowed (e.g., ROLES.ADMIN)
+ *   - number[]: Multiple roles allowed (e.g., [ROLES.ADMIN, ROLES.PROFESSOR])
+ * @param {string} redirectTo - Path to redirect unauthorized users (default: '/login')
  */
-const PrivateRoute = () => {
-  const { user, loading, isAuthenticated, hasRole, ROLES } = useAuth();
+const PrivateRoute = ({ allowedRoles = null, redirectTo = '/login' }) => {
+  const { loading, isAuthenticated, hasRole, ROLES } = useAuth();
 
   // Show loading spinner while checking auth
   if (loading) {
@@ -16,15 +23,31 @@ const PrivateRoute = () => {
 
   // Redirect to login if not authenticated
   if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
-  // Redirect to login if user doesn't have Chef Département role
-  if (!hasRole(ROLES.CHEF_DEPARTEMENT)) {
-    return <Navigate to="/login" replace />;
+  // If no specific roles required, allow any authenticated user
+  if (allowedRoles === null || allowedRoles === undefined) {
+    return <Outlet />;
+  }
+
+  // Check role authorization
+  const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+  const hasRequiredRole = roles.some(role => hasRole(role));
+
+  if (!hasRequiredRole) {
+    return <Navigate to={redirectTo} replace />;
   }
 
   return <Outlet />;
+};
+
+PrivateRoute.propTypes = {
+  allowedRoles: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.arrayOf(PropTypes.number)
+  ]),
+  redirectTo: PropTypes.string
 };
 
 export default PrivateRoute;
