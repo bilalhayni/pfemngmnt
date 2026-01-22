@@ -5,8 +5,10 @@
  * Import services from here rather than individual files.
  */
 
-// API Client
-export { default as apiClient, clearAuthCookies } from './client';
+// API Client - import and re-export both as named and default
+import apiClient, { clearAuthCookies } from './client';
+export { apiClient, clearAuthCookies };
+export default apiClient;
 
 // Auth Service
 export { default as authService } from './auth.service';
