@@ -903,6 +903,47 @@ app.get("/student/stats", (req, res) => {
   });
 });
 
+// ************************* Professor Portal Stats *****************************
+
+// Professor dashboard stats
+app.get("/professor/stats", (req, res) => {
+  const userId = req.query.userId;
+
+  const stats = {
+    myPfes: 0,
+    pendingRequests: 0,
+    assignedStudents: 0
+  };
+
+  let completed = 0;
+  const total = 3;
+
+  const checkComplete = () => {
+    completed++;
+    if (completed === total) {
+      res.json(stats);
+    }
+  };
+
+  // Count professor's PFEs
+  db.query("SELECT COUNT(*) as count FROM pfe WHERE idProf = ?", [userId], (err, result) => {
+    if (!err && result[0]) stats.myPfes = result[0].count;
+    checkComplete();
+  });
+
+  // Count pending requests
+  db.query("SELECT COUNT(*) as count FROM demandes WHERE idProf = ? AND dispo = 0", [userId], (err, result) => {
+    if (!err && result[0]) stats.pendingRequests = result[0].count;
+    checkComplete();
+  });
+
+  // Count assigned students
+  db.query("SELECT COUNT(*) as count FROM demandes WHERE idProf = ? AND dispo = 1", [userId], (err, result) => {
+    if (!err && result[0]) stats.assignedStudents = result[0].count;
+    checkComplete();
+  });
+});
+
 // ************************* Statistics *****************************
 
 // Get professor count by filiere (for admin charts)

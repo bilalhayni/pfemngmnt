@@ -162,4 +162,36 @@ export const adminService = {
   deleteUser: (id) => api.delete(`/deleteUser/${id}`)
 };
 
+// Professor Portal Services
+export const professorPortalService = {
+  // Stats
+  getStats: (userId) => api.get(`/professor/stats?userId=${userId}`),
+
+  // Profile
+  getProfile: (id) => api.get(`/profile/${id}`),
+  updateProfile: (data) => api.put('/updateProfile', data),
+
+  // PFEs
+  getMyPfes: (userId) => api.get(`/myPfe/${userId}`),
+  getPfeDetails: (id) => api.get(`/SinglePfe/${id}`),
+  getPfePrerequisites: (id) => api.get(`/prerequisPfe/${id}`),
+  createPfe: (data) => api.post('/newPfe', data),
+  updatePfe: (data) => api.put('/updatePfe', data),
+  deletePfe: (id) => api.delete(`/deletePfe/${id}`),
+  updatePfeProgress: (id, avancement) => api.put('/updateavan', { id, avancement }),
+  setDefenseDate: (id, date) => api.put('/updateDateSout', { id, date }),
+
+  // Domains & Prerequisites
+  getDomains: (filiereId) => api.get(`/domaineFil/${filiereId}`),
+  getPrerequisites: (filiereId) => api.get(`/prerequisFil/${filiereId}`),
+
+  // Student Requests
+  getStudentRequests: (userId) => api.get(`/demandes/${userId}`),
+  acceptRequest: (id) => api.put('/affectPfe', { id }),
+  rejectRequest: (id) => api.delete(`/deleteDemande/${id}`),
+
+  // My Students
+  getMyStudents: (userId) => api.get(`/stdPfe/${userId}`)
+};
+
 export default api;

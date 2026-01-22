@@ -1,0 +1,94 @@
+.professor-dashboard {
+  padding: 0;
+}
+
+.professor-dashboard__welcome {
+  margin-bottom: 2rem;
+}
+
+.professor-dashboard__greeting {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.professor-dashboard__name {
+  color: #4f6bed;
+}
+
+.professor-dashboard__subtitle {
+  color: #64748b;
+  margin: 0;
+}
+
+.professor-dashboard__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.professor-dashboard__stats--loading {
+  opacity: 0.6;
+}
+
+.professor-dashboard__quick-actions {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.professor-dashboard__quick-actions h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 1.25rem 0;
+}
+
+.professor-dashboard__actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.professor-action-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #1e293b;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.professor-action-card:hover {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  transform: translateY(-2px);
+}
+
+.professor-action-card__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.professor-action-card__icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: white;
+}
+
+.professor-action-card span {
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
