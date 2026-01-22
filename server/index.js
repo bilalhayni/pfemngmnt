@@ -208,6 +208,57 @@ app.post("/logout", (req, res) => {
 
 // ************************* Admin *****************************
 
+// Admin dashboard stats
+app.get("/admin/stats", (req, res) => {
+  const stats = {
+    professors: 0,
+    chefDepartements: 0,
+    students: 0,
+    pendingStudents: 0,
+    filieres: 0
+  };
+
+  let completed = 0;
+  const total = 5;
+
+  const checkComplete = () => {
+    completed++;
+    if (completed === total) {
+      res.json(stats);
+    }
+  };
+
+  // Count professors
+  db.query("SELECT COUNT(*) as count FROM users WHERE role = 0", (err, result) => {
+    if (!err && result[0]) stats.professors = result[0].count;
+    checkComplete();
+  });
+
+  // Count chefs de département
+  db.query("SELECT COUNT(*) as count FROM users WHERE role = 1", (err, result) => {
+    if (!err && result[0]) stats.chefDepartements = result[0].count;
+    checkComplete();
+  });
+
+  // Count activated students
+  db.query("SELECT COUNT(*) as count FROM users WHERE role = 2 AND valid = 1", (err, result) => {
+    if (!err && result[0]) stats.students = result[0].count;
+    checkComplete();
+  });
+
+  // Count pending students
+  db.query("SELECT COUNT(*) as count FROM users WHERE role = 2 AND valid = 0", (err, result) => {
+    if (!err && result[0]) stats.pendingStudents = result[0].count;
+    checkComplete();
+  });
+
+  // Count filieres
+  db.query("SELECT COUNT(*) as count FROM filiere", (err, result) => {
+    if (!err && result[0]) stats.filieres = result[0].count;
+    checkComplete();
+  });
+});
+
 // Create professor/chef departement account
 app.post("/adminCreate", (req, res) => {
   const { email, password, role, filiere } = req.body;
@@ -380,6 +431,18 @@ app.put("/validStd", (req, res) => {
   });
 });
 
+// Block student account
+app.put("/blockStd", (req, res) => {
+  const { id } = req.body;
+
+  db.query("UPDATE users SET valid = 0 WHERE id = ?", [id], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: "Block failed" });
+    }
+    res.json({ message: "Student blocked" });
+  });
+});
+
 // Delete user (reject activation)
 app.delete("/deleteUser/:id", (req, res) => {
   const id = req.params.id;
@@ -467,6 +530,30 @@ app.post("/addFiliere", (req, res) => {
       return res.status(500).json({ error: "Creation failed" });
     }
     res.status(201).json({ message: "Filiere created", id: result.insertId });
+  });
+});
+
+// Create filiere (alias for addFiliere)
+app.post("/filiere", (req, res) => {
+  const { name } = req.body;
+
+  db.query("INSERT INTO filiere (name) VALUES (?)", [name], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: "Creation failed" });
+    }
+    res.status(201).json({ message: "Filiere created", id: result.insertId });
+  });
+});
+
+// Delete filiere
+app.delete("/filiere/:id", (req, res) => {
+  const id = req.params.id;
+
+  db.query("DELETE FROM filiere WHERE idFiliere = ?", [id], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: "Delete failed" });
+    }
+    res.json({ message: "Filiere deleted" });
   });
 });
 
