@@ -1,16 +1,26 @@
 import { Outlet, Navigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import { useAuth } from '../context/AuthContext';
+import { Loading } from '../components/common';
 
-// Chef Département route (role === 1)
+/**
+ * Protected route for Chef Département (role === 1)
+ * Uses AuthContext instead of accessing cookies directly
+ */
 const PrivateRoute = () => {
-  const auth = Cookies.get('auth');
-  const role = Cookies.get('role');
+  const { user, loading, isAuthenticated, hasRole, ROLES } = useAuth();
 
-  if (!auth) {
+  // Show loading spinner while checking auth
+  if (loading) {
+    return <Loading fullPage message="Vérification de l'authentification..." />;
+  }
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
 
-  if (role !== '1') {
+  // Redirect to login if user doesn't have Chef Département role
+  if (!hasRole(ROLES.CHEF_DEPARTEMENT)) {
     return <Navigate to="/login" replace />;
   }
 

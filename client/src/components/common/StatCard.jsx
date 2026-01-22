@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import './StatCard.css';
 
 const StatCard = ({ title, value, subtitle, icon, iconBgColor }) => {
@@ -52,6 +53,20 @@ const StatCard = ({ title, value, subtitle, icon, iconBgColor }) => {
       </div>
     </div>
   );
+};
+
+StatCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  subtitle: PropTypes.string,
+  icon: PropTypes.oneOf(['professors', 'students', 'projects', 'domains']),
+  iconBgColor: PropTypes.string
+};
+
+StatCard.defaultProps = {
+  subtitle: '',
+  icon: 'projects',
+  iconBgColor: '#a65b43'
 };
 
 export default StatCard;

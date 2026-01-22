@@ -105,11 +105,17 @@ export const AuthProvider = ({ children }) => {
           };
         }
 
-        // Set cookies with JWT token
-        Cookies.set('auth', token, { expires: 1 }); // 1 day expiry
-        Cookies.set('role', userData.role.toString(), { expires: 1 });
-        Cookies.set('userId', (userData.id || userData.idProfesseur || userData.idEtudiant)?.toString(), { expires: 1 });
-        Cookies.set('filId', userData.idFiliere?.toString() || '', { expires: 1 });
+        // Set cookies with JWT token and security options
+        const cookieOptions = {
+          expires: 1, // 1 day expiry
+          secure: process.env.REACT_APP_COOKIE_SECURE === 'true', // Use secure cookies in production (HTTPS)
+          sameSite: process.env.REACT_APP_COOKIE_SAME_SITE || 'lax' // CSRF protection
+        };
+
+        Cookies.set('auth', token, cookieOptions);
+        Cookies.set('role', userData.role.toString(), cookieOptions);
+        Cookies.set('userId', (userData.id || userData.idProfesseur || userData.idEtudiant)?.toString(), cookieOptions);
+        Cookies.set('filId', userData.idFiliere?.toString() || '', cookieOptions);
 
         setUser({
           id: userData.id || userData.idProfesseur || userData.idEtudiant,
@@ -183,7 +189,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authService.refreshToken();
       if (response.data.token) {
-        Cookies.set('auth', response.data.token, { expires: 1 });
+        const cookieOptions = {
+          expires: 1,
+          secure: process.env.REACT_APP_COOKIE_SECURE === 'true',
+          sameSite: process.env.REACT_APP_COOKIE_SAME_SITE || 'lax'
+        };
+        Cookies.set('auth', response.data.token, cookieOptions);
         setUser(prev => ({ ...prev, token: response.data.token }));
         return true;
       }

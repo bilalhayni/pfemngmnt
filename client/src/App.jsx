@@ -1,61 +1,57 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context';
 import { PrivateRoute, PrivateRouteProf, PrivateRouteAdmin, PrivateRouteStudent, PrivateRouteAuth } from './routes';
+import { ErrorBoundary, Loading } from './components/common';
 
-// Forms
+// Eager load authentication forms (needed immediately)
 import { LoginForm, SignUpForm } from './components/forms';
 
+// Lazy load pages for code splitting (loaded on demand)
 // Chef Département Pages
-import {
-  Dashboard,
-  Professeurs,
-  Etudiants,
-  MesPfes,
-  TousLesPfes,
-  PfesEtudiants,
-  Demandes,
-  Domaines
-} from './pages';
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Professeurs = lazy(() => import('./pages/Professeurs'));
+const Etudiants = lazy(() => import('./pages/Etudiants'));
+const MesPfes = lazy(() => import('./pages/MesPfes'));
+const TousLesPfes = lazy(() => import('./pages/TousLesPfes'));
+const PfesEtudiants = lazy(() => import('./pages/PfesEtudiants'));
+const Demandes = lazy(() => import('./pages/Demandes'));
+const Domaines = lazy(() => import('./pages/Domaines'));
 
 // Admin Pages
-import {
-  AdminDashboard,
-  PendingStudents,
-  ActivatedStudents,
-  ListProfessors,
-  ListChefDepartement,
-  CreateAccount,
-  CreateFiliere
-} from './pages/admin';
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const PendingStudents = lazy(() => import('./pages/admin/PendingStudents'));
+const ActivatedStudents = lazy(() => import('./pages/admin/ActivatedStudents'));
+const ListProfessors = lazy(() => import('./pages/admin/ListProfessors'));
+const ListChefDepartement = lazy(() => import('./pages/admin/ListChefDepartement'));
+const CreateAccount = lazy(() => import('./pages/admin/CreateAccount'));
+const CreateFiliere = lazy(() => import('./pages/admin/CreateFiliere'));
 
 // Student Pages
-import {
-  StudentDashboard,
-  ListAllPfe,
-  MyApplications,
-  MyPfe,
-  PfeDetails,
-  StudentProfile
-} from './pages/student';
+const StudentDashboard = lazy(() => import('./pages/student/StudentDashboard'));
+const ListAllPfe = lazy(() => import('./pages/student/ListAllPfe'));
+const MyApplications = lazy(() => import('./pages/student/MyApplications'));
+const MyPfe = lazy(() => import('./pages/student/MyPfe'));
+const PfeDetails = lazy(() => import('./pages/student/PfeDetails'));
+const StudentProfile = lazy(() => import('./pages/student/StudentProfile'));
 
 // Professor Pages
-import {
-  ProfessorDashboard,
-  MyPfes as ProfessorMyPfes,
-  CreatePfe,
-  StudentRequests,
-  MyStudents,
-  ProfessorProfile
-} from './pages/professor';
+const ProfessorDashboard = lazy(() => import('./pages/professor/ProfessorDashboard'));
+const ProfessorMyPfes = lazy(() => import('./pages/professor/MyPfes'));
+const CreatePfe = lazy(() => import('./pages/professor/CreatePfe'));
+const StudentRequests = lazy(() => import('./pages/professor/StudentRequests'));
+const MyStudents = lazy(() => import('./pages/professor/MyStudents'));
+const ProfessorProfile = lazy(() => import('./pages/professor/ProfessorProfile'));
 
 // Page Not Found
-import PageNotFound from './pages/PageNotFound';
+const PageNotFound = lazy(() => import('./pages/PageNotFound'));
 
 function App() {
   return (
-    <AuthProvider>
-      <Routes>
+    <ErrorBoundary>
+      <AuthProvider>
+        <Suspense fallback={<Loading fullPage message="Chargement de l'application..." />}>
+          <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignUpForm />} />
@@ -113,8 +109,10 @@ function App() {
 
         {/* 404 Page */}
         <Route path="*" element={<PageNotFound />} />
-      </Routes>
-    </AuthProvider>
+          </Routes>
+        </Suspense>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
