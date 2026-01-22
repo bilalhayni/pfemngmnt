@@ -97,19 +97,11 @@ const LoginForm = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-logo">
-          <div className="login-logo-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <rect x="3" y="3" width="8" height="8" rx="2" />
-              <rect x="13" y="3" width="8" height="8" rx="2" />
-              <rect x="3" y="13" width="8" height="8" rx="2" />
-              <rect x="13" y="13" width="8" height="8" rx="2" />
-            </svg>
-          </div>
-          <span className="login-logo-text">PFE Manager</span>
+          <img src='/logo-fpn.svg'    />         
         </div>
 
         <h1 className="login-title">Se connecter</h1>
-        <p className="login-subtitle">Bienvenue! Veuillez vous connecter pour continuer</p>
+        <p className="login-subtitle">Bienvenue ! Veuillez vous connecter pour continuer</p>
 
         <form onSubmit={handleSubmit} className="login-form" noValidate>
           <div className="form-group">

@@ -15,7 +15,7 @@
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   padding: 48px;
   width: 100%;
-  max-width: 420px;
+  max-width: 620px;
 }
 
 /* Logo Section */
@@ -23,31 +23,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 32px;
+  margin-bottom: 20px;
 }
 
-.login-logo-icon {
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, #a65b43 0%, #8b4a36 100%);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
+
+.login-logo img {
+  width: 250px;
 }
 
-.login-logo-icon svg {
-  width: 24px;
-  height: 24px;
-  color: #ffffff;
-}
-
-.login-logo-text {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1a1a2e;
-}
 
 /* Title */
 .login-title {
@@ -61,7 +45,7 @@
 .login-subtitle {
   font-size: 14px;
   color: #6b7280;
-  margin: 0 0 32px 0;
+  margin: 0 0 20px 0;
   text-align: center;
 }
 
@@ -103,6 +87,8 @@
   border-color: #a65b43;
   background-color: #ffffff;
   box-shadow: 0 0 0 3px rgba(79, 107, 237, 0.1);
+  outline: none;
+  border: none;
 }
 
 .form-input--error {
@@ -150,7 +136,7 @@
 /* Login Button */
 .login-button {
   width: 100%;
-  background-color: #a65b43;
+  background-color: #a65b43 !important;
   color: #ffffff;
   border: none;
   border-radius: 10px;

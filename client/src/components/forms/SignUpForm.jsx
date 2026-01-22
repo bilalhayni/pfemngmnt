@@ -134,9 +134,6 @@ const SignUpForm = () => {
   return (
     <div className="signup-container">
       <div className="signup-wrapper">
-        <div className="signup-logo">
-          <img src="/logo-fpn.svg" alt="Faculté Pluridisciplinaire de Nador" />
-        </div>
 
         <MultiStepForm
           steps={steps}
