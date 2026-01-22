@@ -1,13 +1,38 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import './Header.css';
 
 const Header = ({ title, userName, userEmail, userInitials }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
   const navigate = useNavigate();
+  const { logout, user, ROLES } = useAuth();
 
-  // Close dropdown when clicking outside
+  // Determine profile and settings routes based on user role
+  const getProfileRoute = () => {
+    if (!user) return '/profile';
+    switch (user.role) {
+      case ROLES.PROFESSOR: return '/prof/profile';
+      case ROLES.STUDENT: return '/student/profile';
+      case ROLES.ADMIN: return '/admin/profile';
+      case ROLES.CHEF_DEPARTEMENT: return '/profile';
+      default: return '/profile';
+    }
+  };
+
+  const getSettingsRoute = () => {
+    if (!user) return '/settings';
+    switch (user.role) {
+      case ROLES.PROFESSOR: return '/prof/settings';
+      case ROLES.STUDENT: return '/student/settings';
+      case ROLES.ADMIN: return '/admin/settings';
+      case ROLES.CHEF_DEPARTEMENT: return '/settings';
+      default: return '/settings';
+    }
+  };
+
+  // Close dropdown when clicking outside or pressing ESC
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
@@ -15,20 +40,37 @@ const Header = ({ title, userName, userEmail, userInitials }) => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    const handleEscKey = (event) => {
+      if (event.key === 'Escape' || event.key === 'Esc') {
+        setIsProfileOpen(false);
+      }
+    };
 
-  const handleSignOut = () => {
-    // Handle sign out logic here
-    console.log('Signing out...');
+    if (isProfileOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscKey);
+
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+        document.removeEventListener('keydown', handleEscKey);
+      };
+    }
+  }, [isProfileOpen]);
+
+  const handleSignOut = async () => {
     setIsProfileOpen(false);
+    await logout();
     navigate('/login');
   };
 
   const handleProfileClick = () => {
     setIsProfileOpen(false);
-    navigate('/profile');
+    navigate(getProfileRoute());
+  };
+
+  const handleSettingsClick = () => {
+    setIsProfileOpen(false);
+    navigate(getSettingsRoute());
   };
 
   return (
@@ -80,7 +122,7 @@ const Header = ({ title, userName, userEmail, userInitials }) => {
                   </button>
                 </li>
                 <li>
-                  <button className="profile-dropdown__item" onClick={() => { setIsProfileOpen(false); navigate('/settings'); }}>
+                  <button className="profile-dropdown__item" onClick={handleSettingsClick}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <circle cx="12" cy="12" r="3" />
                       <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />

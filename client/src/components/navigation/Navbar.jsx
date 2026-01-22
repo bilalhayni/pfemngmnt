@@ -40,7 +40,7 @@ const Navbar = () => {
     <nav className={`navbar ${isCollapsed ? 'navbar--collapsed' : ''}`} aria-label="Main navigation">
       <div className="navbar__header">
         <div className="navbar__logo">
-          <img src='/logo-fpn.svg' />
+          <img src='/logo-fpn.svg' alt="Logo" />
         </div>
         <button
           className="navbar__toggle"
