@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import './DataTable.css';
 
 const DataTable = ({
@@ -110,6 +111,29 @@ const DataTable = ({
       </div>
     </div>
   );
+};
+
+DataTable.propTypes = {
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      sortable: PropTypes.bool,
+      render: PropTypes.func
+    })
+  ).isRequired,
+  data: PropTypes.array.isRequired,
+  onRowClick: PropTypes.func,
+  emptyMessage: PropTypes.string,
+  searchable: PropTypes.bool,
+  searchPlaceholder: PropTypes.string
+};
+
+DataTable.defaultProps = {
+  emptyMessage: 'Aucune donnée disponible',
+  searchable: true,
+  searchPlaceholder: 'Rechercher...',
+  onRowClick: null
 };
 
 export default DataTable;

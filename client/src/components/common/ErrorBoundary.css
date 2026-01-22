@@ -1,0 +1,181 @@
+.error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--spacing-lg, 24px);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: var(--font-family, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+}
+
+.error-boundary__container {
+  max-width: 600px;
+  width: 100%;
+  background: white;
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--spacing-2xl, 32px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  text-align: center;
+}
+
+.error-boundary__icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto var(--spacing-lg, 24px);
+  color: #ef4444;
+}
+
+.error-boundary__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.error-boundary__title {
+  font-size: var(--font-size-2xl, 24px);
+  font-weight: 700;
+  color: var(--color-neutral-900, #111827);
+  margin: 0 0 var(--spacing-md, 16px);
+  line-height: 1.2;
+}
+
+.error-boundary__message {
+  font-size: var(--font-size-md, 16px);
+  color: var(--color-neutral-600, #6b7280);
+  margin: 0 0 var(--spacing-xl, 28px);
+  line-height: 1.6;
+}
+
+.error-boundary__details {
+  margin: var(--spacing-xl, 28px) 0;
+  text-align: left;
+  background: var(--color-neutral-50, #f9fafb);
+  border: 1px solid var(--color-neutral-200, #e5e7eb);
+  border-radius: var(--radius-md, 8px);
+  padding: var(--spacing-md, 16px);
+}
+
+.error-boundary__details-summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-neutral-700, #374151);
+  user-select: none;
+  list-style: none;
+}
+
+.error-boundary__details-summary::-webkit-details-marker {
+  display: none;
+}
+
+.error-boundary__details-summary::before {
+  content: '▶';
+  display: inline-block;
+  margin-right: var(--spacing-xs, 8px);
+  transition: transform 0.2s;
+}
+
+.error-boundary__details[open] .error-boundary__details-summary::before {
+  transform: rotate(90deg);
+}
+
+.error-boundary__details-content {
+  margin-top: var(--spacing-md, 16px);
+  padding-top: var(--spacing-md, 16px);
+  border-top: 1px solid var(--color-neutral-200, #e5e7eb);
+}
+
+.error-boundary__error-name {
+  color: #dc2626;
+  font-size: var(--font-size-sm, 14px);
+  margin: 0 0 var(--spacing-sm, 12px);
+  word-break: break-word;
+}
+
+.error-boundary__stack {
+  font-size: var(--font-size-xs, 12px);
+  color: var(--color-neutral-600, #6b7280);
+  background: var(--color-neutral-100, #f3f4f6);
+  padding: var(--spacing-sm, 12px);
+  border-radius: var(--radius-sm, 6px);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.error-boundary__actions {
+  display: flex;
+  gap: var(--spacing-md, 16px);
+  justify-content: center;
+  margin-bottom: var(--spacing-lg, 24px);
+  flex-wrap: wrap;
+}
+
+.error-boundary__button {
+  padding: var(--spacing-sm, 12px) var(--spacing-lg, 24px);
+  font-size: var(--font-size-md, 16px);
+  font-weight: 600;
+  border-radius: var(--radius-md, 8px);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.error-boundary__button--primary {
+  background-color: var(--color-primary, #a65b43);
+  color: white;
+}
+
+.error-boundary__button--primary:hover {
+  background-color: #8f4d37;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.error-boundary__button--secondary {
+  background-color: var(--color-neutral-100, #f3f4f6);
+  color: var(--color-neutral-700, #374151);
+}
+
+.error-boundary__button--secondary:hover {
+  background-color: var(--color-neutral-200, #e5e7eb);
+  transform: translateY(-1px);
+}
+
+.error-boundary__button:active {
+  transform: translateY(0);
+}
+
+.error-boundary__help {
+  font-size: var(--font-size-sm, 14px);
+  color: var(--color-neutral-500, #9ca3af);
+  margin: 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .error-boundary {
+    padding: var(--spacing-md, 16px);
+  }
+
+  .error-boundary__container {
+    padding: var(--spacing-xl, 28px) var(--spacing-lg, 24px);
+  }
+
+  .error-boundary__title {
+    font-size: var(--font-size-xl, 20px);
+  }
+
+  .error-boundary__message {
+    font-size: var(--font-size-sm, 14px);
+  }
+
+  .error-boundary__actions {
+    flex-direction: column;
+  }
+
+  .error-boundary__button {
+    width: 100%;
+  }
+}
