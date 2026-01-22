@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import filiereService from '../../services/api/filiere.service';
 import Swal from 'sweetalert2';
 import MultiStepForm from './MultiStepForm';
 import './SignUpForm.css';
@@ -9,6 +10,23 @@ const SignUpForm = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [departments, setDepartments] = useState([]);
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await filiereService.getAll();
+        const deptOptions = response.data.map(dept => ({
+          value: dept.id || dept._id,
+          label: dept.nom || dept.name
+        }));
+        setDepartments(deptOptions);
+      } catch (error) {
+        console.error('Erreur lors du chargement des départements:', error);
+      }
+    };
+    fetchDepartments();
+  }, []);
 
   const steps = [
     {
@@ -37,13 +55,8 @@ const SignUpForm = () => {
           label: 'Département',
           type: 'select',
           required: true,
-          options: [
-            { value: 'informatique', label: 'Informatique' },
-            { value: 'mathematiques', label: 'Mathématiques' },
-            { value: 'physique', label: 'Physique' },
-            { value: 'chimie', label: 'Chimie' },
-            { value: 'biologie', label: 'Biologie' }
-          ]
+          placeholder: 'Chargement...',
+          options: departments
         },
         { name: 'cne', label: 'CNE', placeholder: 'Votre CNE', required: true },
         { name: 'cin', label: 'CIN', placeholder: 'Votre CIN', required: true }
