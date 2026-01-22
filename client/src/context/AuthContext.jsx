@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
-import api from '../services/api';
+import api, { authService } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -30,27 +30,42 @@ export const AuthProvider = ({ children }) => {
       const authToken = Cookies.get('auth');
       const userRole = Cookies.get('role');
       const userId = Cookies.get('userId');
+      const filId = Cookies.get('filId');
 
-      if (authToken && userRole) {
+      // Only proceed if we have a JWT token (not just 'true')
+      if (authToken && authToken !== 'true' && userRole) {
         try {
-          const response = await api.get('/verify-token');
+          // Verify token with server
+          const response = await authService.verifyToken();
           if (response.data.valid) {
             setUser({
-              id: userId,
+              id: parseInt(userId),
               role: parseInt(userRole),
+              idFiliere: filId ? parseInt(filId) : null,
               token: authToken,
               ...response.data.user
             });
           } else {
-            logout();
+            // Token invalid, clear everything
+            clearAuth();
           }
         } catch (error) {
-          setUser({
-            id: userId,
-            role: parseInt(userRole),
-            token: authToken
-          });
+          // If verification fails but we have cookies, set basic user data
+          // The API interceptor will handle 401 errors
+          if (error.response?.status === 401) {
+            clearAuth();
+          } else {
+            setUser({
+              id: parseInt(userId),
+              role: parseInt(userRole),
+              idFiliere: filId ? parseInt(filId) : null,
+              token: authToken
+            });
+          }
         }
+      } else if (authToken === 'true' && userRole) {
+        // Legacy auth (before JWT), clear and require re-login
+        clearAuth();
       }
       setLoading(false);
     };
@@ -58,9 +73,17 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
+  const clearAuth = () => {
+    Cookies.remove('auth');
+    Cookies.remove('role');
+    Cookies.remove('userId');
+    Cookies.remove('filId');
+    setUser(null);
+  };
+
   const login = async (email, password) => {
     try {
-      const response = await api.post('/login', { email, password });
+      const response = await authService.login(email, password);
 
       if (response.data && !response.data.message) {
         // Handle both array and object response formats
@@ -73,10 +96,20 @@ export const AuthProvider = ({ children }) => {
           };
         }
 
-        Cookies.set('auth', 'true', { expires: 7 });
-        Cookies.set('role', userData.role.toString(), { expires: 7 });
-        Cookies.set('userId', userData.id?.toString() || userData.idProfesseur?.toString() || userData.idEtudiant?.toString(), { expires: 7 });
-        Cookies.set('filId', userData.idFiliere?.toString() || '', { expires: 7 });
+        // Store JWT token (from server response)
+        const token = userData.token;
+        if (!token) {
+          return {
+            success: false,
+            error: 'Erreur d\'authentification: token non reçu'
+          };
+        }
+
+        // Set cookies with JWT token
+        Cookies.set('auth', token, { expires: 1 }); // 1 day expiry
+        Cookies.set('role', userData.role.toString(), { expires: 1 });
+        Cookies.set('userId', (userData.id || userData.idProfesseur || userData.idEtudiant)?.toString(), { expires: 1 });
+        Cookies.set('filId', userData.idFiliere?.toString() || '', { expires: 1 });
 
         setUser({
           id: userData.id || userData.idProfesseur || userData.idEtudiant,
@@ -85,6 +118,7 @@ export const AuthProvider = ({ children }) => {
           firstName: userData.firstName,
           lastName: userData.lastName,
           idFiliere: userData.idFiliere,
+          token: token,
           ...userData
         });
 
@@ -105,13 +139,17 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await api.post('/registerStudent', userData);
+      const response = await authService.register(userData);
 
-      if (response.data.message) {
-        return { success: false, error: response.data.message };
+      if (response.data.message === 'The Email already exists') {
+        return { success: false, error: 'Cet email existe déjà' };
       }
 
-      return { success: true };
+      if (response.data.userId) {
+        return { success: true };
+      }
+
+      return { success: false, error: response.data.message || 'Erreur d\'inscription' };
     } catch (error) {
       return {
         success: false,
@@ -120,23 +158,47 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    Cookies.remove('auth');
-    Cookies.remove('role');
-    Cookies.remove('userId');
-    setUser(null);
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      // Ignore logout errors
+    }
+    clearAuth();
   };
 
   const resetPassword = async (email) => {
     try {
-      await api.post('/reset-password-email', { email });
+      await authService.resetPassword(email);
       return { success: true };
     } catch (error) {
-      return { success: false, error: "Erreur lors de l'envoi du mot de passe" };
+      return {
+        success: false,
+        error: error.response?.data?.message || "Erreur lors de l'envoi du mot de passe"
+      };
     }
   };
 
-  const isAuthenticated = () => !!user && !!Cookies.get('auth');
+  const refreshToken = async () => {
+    try {
+      const response = await authService.refreshToken();
+      if (response.data.token) {
+        Cookies.set('auth', response.data.token, { expires: 1 });
+        setUser(prev => ({ ...prev, token: response.data.token }));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      clearAuth();
+      return false;
+    }
+  };
+
+  const isAuthenticated = () => {
+    const token = Cookies.get('auth');
+    return !!user && !!token && token !== 'true';
+  };
+
   const hasRole = (role) => user?.role === role;
 
   const getRedirectPath = () => {
@@ -152,7 +214,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{
-      user, loading, login, logout, register, resetPassword,
+      user, loading, login, logout, register, resetPassword, refreshToken,
       isAuthenticated, hasRole, getRedirectPath, ROLES
     }}>
       {children}

@@ -82,7 +82,7 @@ const PfeDetails = () => {
             <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
           <p>PFE non trouvé</p>
-          <Link to="/student/pfe" style={{ marginTop: '1rem', color: '#4f6bed', textDecoration: 'none' }}>
+          <Link to="/student/pfe" style={{ marginTop: '1rem', color: '#a65b43', textDecoration: 'none' }}>
             Retour à la liste des PFEs
           </Link>
         </div>

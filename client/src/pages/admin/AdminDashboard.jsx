@@ -46,7 +46,7 @@ const AdminDashboard = () => {
       value: stats.professors,
       subtitle: 'Total des professeurs',
       icon: 'professors',
-      iconBgColor: '#4f6bed'
+      iconBgColor: '#a65b43'
     },
     {
       title: 'Chefs de Département',
@@ -111,7 +111,7 @@ const AdminDashboard = () => {
               <span>Activer les comptes</span>
             </a>
             <a href="/admin/create-account" className="admin-action-card">
-              <div className="admin-action-card__icon" style={{ backgroundColor: '#4f6bed' }}>
+              <div className="admin-action-card__icon" style={{ backgroundColor: '#a65b43' }}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                   <circle cx="8.5" cy="7" r="4" />

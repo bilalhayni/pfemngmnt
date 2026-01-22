@@ -11,11 +11,11 @@ const api = axios.create({
   }
 });
 
-// Request interceptor
+// Request interceptor - Add JWT token to all requests
 api.interceptors.request.use(
   (config) => {
     const token = Cookies.get('auth');
-    if (token) {
+    if (token && token !== 'true') { // Ensure it's a JWT token, not just 'true'
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -23,19 +23,63 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor
+// Response interceptor - Handle auth errors
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Handle 401 Unauthorized (token expired or invalid)
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      // Check if error is due to token expiration
+      const errorMessage = error.response?.data?.message || '';
+      if (errorMessage.includes('Token expired')) {
+        // Try to refresh token
+        try {
+          const response = await axios.post(`${API_BASE_URL}/refresh-token`, {}, {
+            headers: {
+              Authorization: `Bearer ${Cookies.get('auth')}`
+            }
+          });
+
+          if (response.data.token) {
+            Cookies.set('auth', response.data.token, { expires: 1 });
+            originalRequest.headers.Authorization = `Bearer ${response.data.token}`;
+            return api(originalRequest);
+          }
+        } catch (refreshError) {
+          // Refresh failed, redirect to login
+        }
+      }
+
+      // Clear auth data and redirect to login
       Cookies.remove('auth');
       Cookies.remove('role');
       Cookies.remove('userId');
+      Cookies.remove('filId');
       window.location.href = '/login';
     }
+
+    // Handle 403 Forbidden (insufficient permissions)
+    if (error.response?.status === 403) {
+      console.error('Access denied:', error.response?.data?.message);
+    }
+
     return Promise.reject(error);
   }
 );
+
+// Auth service for JWT operations
+export const authService = {
+  login: (email, password) => api.post('/login', { email, password }),
+  logout: () => api.post('/logout'),
+  verifyToken: () => api.get('/verify-token'),
+  refreshToken: () => api.post('/refresh-token'),
+  register: (data) => api.post('/registerStudent', data),
+  resetPassword: (email) => api.post('/reset-password-email', { email })
+};
 
 // PFE Services
 export const pfeService = {

@@ -79,7 +79,7 @@
 .header__avatar {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #4f6bed 0%, #3b5bdb 100%);
+  background: linear-gradient(135deg, #a65b43 0%, #8b4a36 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -94,12 +94,12 @@
 
 .header__avatar:hover {
   transform: scale(1.05);
-  box-shadow: 0 2px 8px rgba(79, 107, 237, 0.3);
+  box-shadow: 0 2px 8px rgba(166, 91, 67, 0.3);
 }
 
 .header__avatar--active {
   transform: scale(1.05);
-  box-shadow: 0 0 0 3px rgba(79, 107, 237, 0.3);
+  box-shadow: 0 0 0 3px rgba(166, 91, 67, 0.3);
 }
 
 /* Profile Dropdown */
@@ -137,7 +137,7 @@
 .profile-dropdown__avatar {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #4f6bed 0%, #3b5bdb 100%);
+  background: linear-gradient(135deg, #a65b43 0%, #8b4a36 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -217,7 +217,7 @@
 }
 
 .profile-dropdown__item:hover svg {
-  color: #4f6bed;
+  color: #a65b43;
 }
 
 .profile-dropdown__signout {

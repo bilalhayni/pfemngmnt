@@ -108,7 +108,7 @@ const TousLesPfes = () => {
       />
 
       <div className="stats-row">
-        <StatCard title="Total PFEs" value={totalPfes} subtitle="Tous projets" icon="folder" iconBgColor="#4f6bed" />
+        <StatCard title="Total PFEs" value={totalPfes} subtitle="Tous projets" icon="folder" iconBgColor="#a65b43" />
         <StatCard title="En cours" value={enCours} subtitle="Projets actifs" icon="progress" iconBgColor="#10b981" />
         <StatCard title="Terminés" value={termines} subtitle="Projets complétés" icon="check" iconBgColor="#8b5cf6" />
         <StatCard title="Encadrants" value={uniqueSupervisors} subtitle="Professeurs actifs" icon="professors" iconBgColor="#f59e0b" />
