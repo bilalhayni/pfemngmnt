@@ -18,6 +18,17 @@ import {
   Domaines
 } from './pages';
 
+// Admin Pages
+import {
+  AdminDashboard,
+  PendingStudents,
+  ActivatedStudents,
+  ListProfessors,
+  ListChefDepartement,
+  CreateAccount,
+  CreateFiliere
+} from './pages/admin';
+
 // Page Not Found
 import PageNotFound from './pages/PageNotFound';
 
@@ -60,10 +71,13 @@ function App() {
 
         {/* Admin Routes (role === 3) */}
         <Route path="/admin" element={<PrivateRouteAdmin />}>
-          <Route path="home" element={<Dashboard />} />
-          <Route path="prof" element={<Professeurs />} />
-          <Route path="student" element={<Etudiants />} />
-          <Route path="chefDep" element={<Professeurs />} />
+          <Route path="home" element={<AdminDashboard />} />
+          <Route path="pending-students" element={<PendingStudents />} />
+          <Route path="activated-students" element={<ActivatedStudents />} />
+          <Route path="professors" element={<ListProfessors />} />
+          <Route path="chef-departement" element={<ListChefDepartement />} />
+          <Route path="create-account" element={<CreateAccount />} />
+          <Route path="create-filiere" element={<CreateFiliere />} />
         </Route>
 
         {/* Student Routes (role === 2) */}

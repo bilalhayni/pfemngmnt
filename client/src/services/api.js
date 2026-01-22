@@ -128,4 +128,26 @@ export const statsService = {
   getProfessorStats: () => api.get('/stats/professors')
 };
 
+// Admin Services
+export const adminService = {
+  // Stats
+  getStats: () => api.get('/admin/stats'),
+
+  // Students
+  getPendingStudents: () => api.get('/stdListe'),
+  getActivatedStudents: () => api.get('/stdListeAct'),
+  activateStudent: (id) => api.put('/validStd', { id }),
+  blockStudent: (id) => api.put('/blockStd', { id }),
+
+  // Professors
+  getAllProfessors: () => api.get('/allProf'),
+
+  // Chefs de Département
+  getAllChefDepartements: () => api.get('/allChefDep'),
+
+  // User management
+  createAccount: (data) => api.post('/adminCreate', data),
+  deleteUser: (id) => api.delete(`/deleteUser/${id}`)
+};
+
 export default api;

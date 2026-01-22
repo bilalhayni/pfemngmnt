@@ -42,14 +42,18 @@ export const professorNavigationConfig = {
  */
 export const adminNavigationConfig = {
   principal: [
-    { path: '/admin/home', label: "Page d'accueil", icon: 'home' }
+    { path: '/admin/home', label: "Dashboard", icon: 'home' }
   ],
   listes: [
-    { path: '/admin/prof', label: 'Professeurs-es', icon: 'professors' },
-    { path: '/admin/student', label: 'Étudiants-es', icon: 'students' },
-    { path: '/admin/chefDep', label: 'Chefs Département', icon: 'professors' }
+    { path: '/admin/pending-students', label: 'Demandes d\'activation', icon: 'requests' },
+    { path: '/admin/activated-students', label: 'Étudiants actifs', icon: 'students' },
+    { path: '/admin/professors', label: 'Professeurs', icon: 'professors' },
+    { path: '/admin/chef-departement', label: 'Chefs Département', icon: 'professors' }
   ],
-  utile: []
+  utile: [
+    { path: '/admin/create-account', label: 'Créer un compte', icon: 'add' },
+    { path: '/admin/create-filiere', label: 'Gestion filières', icon: 'domains' }
+  ]
 };
 
 /**
