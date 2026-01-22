@@ -71,13 +71,46 @@ const StudentProfile = () => {
     setSuccess('');
   };
 
+  const validateForm = () => {
+    // Check required fields
+    if (!formData.firstName?.trim() || !formData.lastName?.trim() || !formData.email?.trim()) {
+      setError('Veuillez remplir tous les champs obligatoires');
+      return false;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Veuillez entrer une adresse email valide');
+      return false;
+    }
+
+    // Validate phone if provided
+    if (formData.phone && formData.phone.trim()) {
+      const phoneRegex = /^[0-9+\-\s()]{10,}$/;
+      if (!phoneRegex.test(formData.phone)) {
+        setError('Veuillez entrer un numéro de téléphone valide (minimum 10 chiffres)');
+        return false;
+      }
+    }
+
+    // Validate password if provided
+    if (formData.password && formData.password.trim()) {
+      if (formData.password.length < 6) {
+        setError('Le mot de passe doit contenir au moins 6 caractères');
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    if (!formData.firstName || !formData.lastName || !formData.email) {
-      setError('Veuillez remplir tous les champs obligatoires');
+    if (!validateForm()) {
       return;
     }
 
@@ -86,14 +119,15 @@ const StudentProfile = () => {
       const userId = Cookies.get('userId');
       await studentService.updateProfile({
         id: userId,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone?.trim() || '',
         password: formData.password || profile.password,
         fil: formData.filiere
       });
       setSuccess('Profil mis à jour avec succès!');
+      setFormData(prev => ({ ...prev, password: '' })); // Clear password field
     } catch (error) {
       console.error('Error updating profile:', error);
       setError(error.response?.data?.message || 'Erreur lors de la mise à jour du profil');
