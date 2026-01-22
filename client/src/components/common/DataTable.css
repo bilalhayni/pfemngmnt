@@ -37,9 +37,9 @@
 
 .data-table__search-input:focus {
   outline: none;
-  border-color: #4f6bed;
+  border-color: #a65b43;
   background-color: #ffffff;
-  box-shadow: 0 0 0 3px rgba(79, 107, 237, 0.1);
+  box-shadow: 0 0 0 3px rgba(166, 91, 67, 0.1);
 }
 
 .data-table__search-input::placeholder {
@@ -83,7 +83,7 @@
 
 .data-table__sort-icon {
   margin-left: 6px;
-  color: #4f6bed;
+  color: #a65b43;
 }
 
 /* Table Body */
@@ -176,7 +176,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background-color: #4f6bed;
+  background-color: #a65b43;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -250,7 +250,7 @@
 }
 
 .table-action-btn--view:hover svg {
-  color: #4f6bed;
+  color: #a65b43;
 }
 
 /* Responsive */

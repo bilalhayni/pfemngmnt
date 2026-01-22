@@ -35,7 +35,7 @@
 .navbar__logo-icon {
   width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, #4f6bed 0%, #3b5bdb 100%);
+  background: linear-gradient(135deg, #a65b43 0%, #8b4a36 100%);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -148,12 +148,12 @@
 
 .navbar__link--active {
   background-color: #eef2ff;
-  color: #4f6bed;
+  color: #a65b43;
 }
 
 .navbar__link--active:hover {
   background-color: #e0e7ff;
-  color: #4f6bed;
+  color: #a65b43;
 }
 
 /* Link Icon */

@@ -124,7 +124,7 @@ const ProfessorProfile = () => {
             width: '100px',
             height: '100px',
             borderRadius: '50%',
-            background: '#4f6bed',
+            background: '#a65b43',
             color: 'white',
             display: 'flex',
             alignItems: 'center',

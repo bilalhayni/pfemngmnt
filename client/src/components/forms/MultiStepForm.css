@@ -68,7 +68,7 @@
 }
 
 .progress-step--active .progress-step__circle {
-  background-color: #4f6bed;
+  background-color: #a65b43;
   color: #ffffff;
   box-shadow: 0 0 0 4px rgba(79, 107, 237, 0.2);
 }
@@ -87,7 +87,7 @@
 }
 
 .progress-step--active .progress-step__label {
-  color: #4f6bed;
+  color: #a65b43;
   font-weight: 500;
 }
 
@@ -212,7 +212,7 @@
 .form-field__select:focus,
 .form-field__textarea:focus {
   outline: none;
-  border-color: #4f6bed;
+  border-color: #a65b43;
   background-color: #ffffff;
   box-shadow: 0 0 0 3px rgba(79, 107, 237, 0.1);
 }
@@ -258,7 +258,7 @@
   border: 2px solid #d1d5db;
   border-radius: 4px;
   cursor: pointer;
-  accent-color: #4f6bed;
+  accent-color: #a65b43;
 }
 
 .form-field__checkbox-label {
@@ -311,13 +311,13 @@
 
 .multistep-form__btn--next,
 .multistep-form__btn--submit {
-  background-color: #4f6bed;
+  background-color: #a65b43;
   color: #ffffff;
 }
 
 .multistep-form__btn--next:hover,
 .multistep-form__btn--submit:hover {
-  background-color: #3b5bdb;
+  background-color: #8b4a36;
 }
 
 .multistep-form__btn--submit {
