@@ -11,7 +11,7 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const { login, resetPassword, ROLES } = useAuth();
+  const { login, resetPassword, getRedirectPath, ROLES } = useAuth();
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -42,8 +42,9 @@ const LoginForm = () => {
     setIsLoading(false);
 
     if (result.success) {
-      // All users go to the same /home route
-      navigate('/home');
+      // Redirect users to role-specific home page
+      const redirectPath = getRedirectPath();
+      navigate(redirectPath);
     } else {
       Swal.fire({
         icon: 'error',
