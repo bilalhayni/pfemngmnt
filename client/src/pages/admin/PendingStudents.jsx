@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Check, X, Meh } from 'lucide-react';
 import { Layout } from '../../components/layout';
 import { DataTable, PageHeader } from '../../components/common';
 import { adminService } from '../../services/api';
@@ -109,9 +110,7 @@ const PendingStudents = () => {
             onClick={() => handleActivate(row.id, row.name)}
             disabled={actionLoading === row.id}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
+            <Check size={16} />
             {actionLoading === row.id ? '...' : 'Activer'}
           </button>
           <button
@@ -120,10 +119,7 @@ const PendingStudents = () => {
             onClick={() => handleReject(row.id, row.name)}
             disabled={actionLoading === row.id}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <X size={16} />
             Rejeter
           </button>
         </div>
@@ -141,12 +137,7 @@ const PendingStudents = () => {
         <div className="admin-loading">Chargement...</div>
       ) : students.length === 0 ? (
         <div className="admin-empty">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M8 15h8" />
-            <circle cx="9" cy="9" r="1" fill="currentColor" />
-            <circle cx="15" cy="9" r="1" fill="currentColor" />
-          </svg>
+          <Meh size={48} />
           <p>Aucune demande d'activation en attente</p>
         </div>
       ) : (

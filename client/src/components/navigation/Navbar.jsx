@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { Menu } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getNavigationByRole, getIcon } from '../../config';
 import './Navbar.css';
@@ -48,11 +49,7 @@ const Navbar = () => {
           aria-label={isCollapsed ? 'Expand navigation' : 'Collapse navigation'}
           aria-expanded={!isCollapsed}
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
+          <Menu size={24} aria-hidden="true" />
         </button>
       </div>
 

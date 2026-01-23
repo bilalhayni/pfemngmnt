@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Eye, Ban, Trash2, User } from 'lucide-react';
 import { Layout } from '../../components/layout';
 import { DataTable, PageHeader } from '../../components/common';
 import { adminService } from '../../services/api';
@@ -109,10 +110,7 @@ const ActivatedStudents = () => {
             title="Voir le profil"
             onClick={() => navigate(`/users/${row.id}`)}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
+            <Eye size={16} />
           </button>
           <button
             className="table-action-btn table-action-btn--block"
@@ -120,10 +118,7 @@ const ActivatedStudents = () => {
             onClick={() => handleBlock(row.id, row.name)}
             disabled={actionLoading === row.id}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
-            </svg>
+            <Ban size={16} />
           </button>
           <button
             className="table-action-btn table-action-btn--delete"
@@ -131,10 +126,7 @@ const ActivatedStudents = () => {
             onClick={() => handleDelete(row.id, row.name)}
             disabled={actionLoading === row.id}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="3 6 5 6 21 6" />
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-            </svg>
+            <Trash2 size={16} />
           </button>
         </div>
       )
@@ -151,10 +143,7 @@ const ActivatedStudents = () => {
         <div className="admin-loading">Chargement...</div>
       ) : students.length === 0 ? (
         <div className="admin-empty">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-          </svg>
+          <User size={48} />
           <p>Aucun étudiant actif</p>
         </div>
       ) : (

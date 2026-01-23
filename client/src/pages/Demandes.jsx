@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Check, X } from 'lucide-react';
 import { Layout } from '../components/layout';
 import { DataTable, PageHeader, StatCard } from '../components/common';
 import { useAuth } from '../context/AuthContext';
@@ -108,9 +109,7 @@ const Demandes = () => {
             onClick={() => handleAccept(row.id)}
             disabled={actionLoading === row.id}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
+            <Check size={16} />
           </button>
           <button
             className="table-action-btn table-action-btn--reject"
@@ -118,10 +117,7 @@ const Demandes = () => {
             onClick={() => handleReject(row.id)}
             disabled={actionLoading === row.id}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <X size={16} />
           </button>
         </div>
       )
