@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Users, User, Briefcase, LayoutGrid } from 'lucide-react';
+import { Users, User, Briefcase, LayoutGrid, TrendingUp, CheckCircle } from 'lucide-react';
 import './StatCard.css';
 
 const StatCard = ({ title, value, subtitle, icon, iconBgColor }) => {
@@ -8,7 +8,9 @@ const StatCard = ({ title, value, subtitle, icon, iconBgColor }) => {
     professors: <Users size={24} />,
     students: <User size={24} />,
     projects: <Briefcase size={24} />,
-    domains: <LayoutGrid size={24} />
+    domains: <LayoutGrid size={24} />,
+    progress: <TrendingUp size={24} />,
+    check: <CheckCircle size={24} />
   };
 
   return (
@@ -34,7 +36,7 @@ StatCard.propTypes = {
   title: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   subtitle: PropTypes.string,
-  icon: PropTypes.oneOf(['professors', 'students', 'projects', 'domains']),
+  icon: PropTypes.oneOf(['professors', 'students', 'projects', 'domains', 'progress', 'check']),
   iconBgColor: PropTypes.string
 };
 
