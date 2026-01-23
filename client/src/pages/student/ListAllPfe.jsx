@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Send, Eye, Monitor } from 'lucide-react';
 import { Layout } from '../../components/layout';
 import { DataTable, PageHeader } from '../../components/common';
 import { studentService } from '../../services/api';
@@ -98,17 +99,11 @@ const ListAllPfe = () => {
             onClick={() => handleApply(row.id, row.titre, row.idProf)}
             disabled={actionLoading === row.id}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M22 2L11 13" />
-              <path d="M22 2L15 22L11 13L2 9L22 2Z" />
-            </svg>
+            <Send size={16} />
             {actionLoading === row.id ? '...' : 'Postuler'}
           </button>
           <Link to={`/student/pfe/${row.id}`} className="table-action-btn table-action-btn--view">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
+            <Eye size={16} />
             Détails
           </Link>
         </div>
@@ -126,11 +121,7 @@ const ListAllPfe = () => {
         <div className="student-loading">Chargement...</div>
       ) : pfes.length === 0 ? (
         <div className="student-empty">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-            <line x1="8" y1="21" x2="16" y2="21" />
-            <line x1="12" y1="17" x2="12" y2="21" />
-          </svg>
+          <Monitor size={48} />
           <p>Aucun PFE disponible pour le moment</p>
         </div>
       ) : (

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { Search } from 'lucide-react';
 import './DataTable.css';
 
 const DataTable = ({
@@ -44,10 +45,7 @@ const DataTable = ({
     <div className="data-table">
       {searchable && (
         <div className="data-table__search">
-          <svg className="data-table__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8" />
-            <path d="M21 21l-4.35-4.35" />
-          </svg>
+          <Search className="data-table__search-icon" size={18} />
           <input
             type="text"
             className="data-table__search-input"
