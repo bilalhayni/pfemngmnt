@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { Layout } from '../components/layout';
 import { PageHeader } from '../components/common';
 import { useAuth } from '../context/AuthContext';
@@ -149,9 +150,7 @@ const UserProfile = () => {
       <div className="user-profile">
         <div className="user-profile__header">
           <button onClick={() => navigate(-1)} className="user-profile__back">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 19l-7-7 7-7"/>
-            </svg>
+            <ArrowLeft size={16} />
             Retour
           </button>
         </div>

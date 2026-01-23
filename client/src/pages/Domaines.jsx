@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { LayoutGrid } from 'lucide-react';
 import { Layout } from '../components/layout';
 import { DataTable, PageHeader } from '../components/common';
 import { useAuth } from '../context/AuthContext';
@@ -114,12 +115,7 @@ const Domaines = () => {
       render: (value, row) => (
         <div className="domain-name">
           <div className="domain-icon" style={{ backgroundColor: row.color }}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="7" height="7" />
-              <rect x="14" y="3" width="7" height="7" />
-              <rect x="14" y="14" width="7" height="7" />
-              <rect x="3" y="14" width="7" height="7" />
-            </svg>
+            <LayoutGrid size={16} />
           </div>
           <span>{value}</span>
         </div>

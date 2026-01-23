@@ -1,4 +1,5 @@
 import React from 'react';
+import { Circle } from 'lucide-react';
 import './ProgressChart.css';
 
 const ProgressChart = ({ title, linkText, linkHref, data }) => {
@@ -29,9 +30,7 @@ const ProgressChart = ({ title, linkText, linkHref, data }) => {
       <div className="progress-chart__header">
         <div className="progress-chart__title-wrapper">
           <div className="progress-chart__icon">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <circle cx="12" cy="12" r="10" />
-            </svg>
+            <Circle size={20} fill="currentColor" />
           </div>
           <h3 className="progress-chart__title">{title}</h3>
         </div>

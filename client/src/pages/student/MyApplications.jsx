@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { X, ClipboardList } from 'lucide-react';
 import { Layout } from '../../components/layout';
 import { DataTable, PageHeader } from '../../components/common';
 import { studentService } from '../../services/api';
@@ -92,10 +93,7 @@ const MyApplications = () => {
             onClick={() => handleCancel(row.id, row.titre)}
             disabled={actionLoading === row.id}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <X size={16} />
             {actionLoading === row.id ? '...' : 'Annuler'}
           </button>
         </div>
@@ -113,12 +111,7 @@ const MyApplications = () => {
         <div className="student-loading">Chargement...</div>
       ) : applications.length === 0 ? (
         <div className="student-empty">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-            <line x1="9" y1="9" x2="15" y2="9" />
-            <line x1="9" y1="12" x2="15" y2="12" />
-            <line x1="9" y1="15" x2="12" y2="15" />
-          </svg>
+          <ClipboardList size={48} />
           <p>Vous n'avez pas encore postulé à un PFE</p>
           <a href="/student/pfe" style={{ marginTop: '1rem', color: '#a65b43', textDecoration: 'none' }}>
             Parcourir les PFEs disponibles
