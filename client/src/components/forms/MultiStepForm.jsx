@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import './MultiStepForm.css';
 import { Link, useNavigate } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, Check, Loader2 } from 'lucide-react';
+import './MultiStepForm.css';
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const MultiStepForm = ({
@@ -247,9 +248,7 @@ const MultiStepForm = ({
             onClick={handlePrev}
             disabled={isFirstStep}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
+            <ChevronLeft size={20} />
             Précédent
           </button>
 
@@ -261,26 +260,20 @@ const MultiStepForm = ({
             >
               {isSubmitting ? (
                 <>
-                  <svg className="spinner" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" />
-                  </svg>
+                  <Loader2 className="spinner" size={20} />
                   Chargement...
                 </>
               ) : (
                 <>
                   {submitLabel}
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
+                  <Check size={20} />
                 </>
               )}
             </button>
           ) : (
             <button type="button" className="multistep-form__btn multistep-form__btn--next" onClick={handleNext}>
               Suivant
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
+              <ChevronRight size={20} />
             </button>
           )}
         </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Folder } from 'lucide-react';
 import { Layout } from '../../components/layout';
 import { DataTable, PageHeader } from '../../components/common';
 import { studentService } from '../../services/api';
@@ -85,9 +86,7 @@ const MyPfe = () => {
         <div className="student-loading">Chargement...</div>
       ) : pfe.length === 0 ? (
         <div className="student-empty">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-          </svg>
+          <Folder size={48} />
           <p>Vous n'avez pas encore de PFE assigné</p>
           <a href="/student/applications" style={{ marginTop: '1rem', color: '#a65b43', textDecoration: 'none' }}>
             Voir mes postulations en cours

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Swal from 'sweetalert2';
 import './LoginForm.css';
@@ -154,9 +155,7 @@ const LoginForm = () => {
             >
               {isLoading ? (
                 <span className="login-button__loading">
-                  <svg className="spinner" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" />
-                  </svg>
+                  <Loader2 className="spinner" size={20} />
                   Connexion...
                 </span>
               ) : (

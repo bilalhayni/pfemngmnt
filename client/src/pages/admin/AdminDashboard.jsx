@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Check, X, UserPlus, Users, FolderPlus } from 'lucide-react';
 import { Layout } from '../../components/layout';
 import StatCard from '../../components/common/StatCard';
 import { useAuth } from '../../context/AuthContext';
@@ -231,9 +232,7 @@ const AdminDashboard = () => {
             onClick={() => handleAccept(row.id)}
             disabled={actionLoading === row.id}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
+            <Check size={16} />
           </button>
           <button
             className="table-action-btn table-action-btn--reject"
@@ -241,10 +240,7 @@ const AdminDashboard = () => {
             onClick={() => handleReject(row.id)}
             disabled={actionLoading === row.id}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <X size={16} />
           </button>
         </div>
       )
@@ -283,44 +279,25 @@ const AdminDashboard = () => {
           <div className="admin-dashboard__actions-grid">
             <a href="/admin/pending-students" className="admin-action-card">
               <div className="admin-action-card__icon" style={{ backgroundColor: '#ef4444' }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                  <circle cx="8.5" cy="7" r="4" />
-                  <line x1="20" y1="8" x2="20" y2="14" />
-                  <line x1="23" y1="11" x2="17" y2="11" />
-                </svg>
+                <UserPlus size={24} />
               </div>
               <span>Activer les comptes</span>
             </a>
             <a href="/admin/create-account" className="admin-action-card">
               <div className="admin-action-card__icon" style={{ backgroundColor: '#a65b43' }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                  <circle cx="8.5" cy="7" r="4" />
-                  <line x1="20" y1="8" x2="20" y2="14" />
-                  <line x1="23" y1="11" x2="17" y2="11" />
-                </svg>
+                <UserPlus size={24} />
               </div>
               <span>Créer un compte</span>
             </a>
             <a href="/admin/professors" className="admin-action-card">
               <div className="admin-action-card__icon" style={{ backgroundColor: '#10b981' }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
+                <Users size={24} />
               </div>
               <span>Gérer les professeurs</span>
             </a>
             <a href="/admin/create-filiere" className="admin-action-card">
               <div className="admin-action-card__icon" style={{ backgroundColor: '#f59e0b' }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                  <line x1="12" y1="11" x2="12" y2="17" />
-                  <line x1="9" y1="14" x2="15" y2="14" />
-                </svg>
+                <FolderPlus size={24} />
               </div>
               <span>Ajouter une filière</span>
             </a>
