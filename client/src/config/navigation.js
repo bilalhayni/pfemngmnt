@@ -5,18 +5,18 @@
 
 export const navigationConfig = {
   principal: [
-    { path: '/', label: "Page d'accueil", icon: 'home' }
+    { path: '/', label: 'Accueil', icon: 'home' }
   ],
   listes: [
-    { path: '/professeurs', label: 'Professeurs-es', icon: 'professors' },
-    { path: '/etudiants', label: 'Étudiants-es', icon: 'students' },
-    { path: '/mes-pfes', label: "Mes PFE's", icon: 'folder' },
-    { path: '/tous-les-pfes', label: "Tous les PFE's", icon: 'all-projects' },
-    { path: '/pfes-etudiants', label: "PFE's et étds-es", icon: 'project-students' }
+    { path: '/professeurs', label: 'Professeurs', icon: 'professors' },
+    { path: '/etudiants', label: 'Étudiants', icon: 'students' },
+    { path: '/mes-pfes', label: 'Mes PFEs', icon: 'folder' },
+    { path: '/tous-les-pfes', label: 'Tous les PFEs', icon: 'all-projects' },
+    { path: '/pfes-etudiants', label: 'PFEs et étudiants', icon: 'project-students' }
   ],
   utile: [
     { path: '/demandes', label: 'Demandes', icon: 'requests' },
-    { path: '/domaines', label: 'Domaines PFE', icon: 'domains' }
+    { path: '/domaines', label: 'Domaines de PFE', icon: 'domains' }
   ]
 };
 
@@ -25,16 +25,16 @@ export const navigationConfig = {
  */
 export const professorNavigationConfig = {
   principal: [
-    { path: '/prof/home', label: "Dashboard", icon: 'home' }
+    { path: '/prof/home', label: 'Tableau de bord', icon: 'home' }
   ],
   listes: [
-    { path: '/prof/pfe', label: "Mes PFEs", icon: 'folder' },
+    { path: '/prof/pfe', label: 'Mes PFEs', icon: 'folder' },
     { path: '/prof/demandes', label: 'Demandes', icon: 'requests' },
-    { path: '/prof/students', label: 'Mes Étudiants', icon: 'students' }
+    { path: '/prof/students', label: 'Mes étudiants', icon: 'students' }
   ],
   utile: [
     { path: '/prof/pfe/new', label: 'Créer un PFE', icon: 'add' },
-    { path: '/prof/profile', label: 'Mon Profil', icon: 'students' }
+    { path: '/prof/profile', label: 'Mon profil', icon: 'students' }
   ]
 };
 
@@ -43,17 +43,17 @@ export const professorNavigationConfig = {
  */
 export const adminNavigationConfig = {
   principal: [
-    { path: '/admin/home', label: "Dashboard", icon: 'home' }
+    { path: '/admin/home', label: 'Tableau de bord', icon: 'home' }
   ],
   listes: [
-    { path: '/admin/pending-students', label: 'Demandes d\'activation', icon: 'requests' },
+    { path: '/admin/pending-students', label: "Demandes d’activation", icon: 'requests' },
     { path: '/admin/activated-students', label: 'Étudiants actifs', icon: 'students' },
     { path: '/admin/professors', label: 'Professeurs', icon: 'professors' },
-    { path: '/admin/chef-departement', label: 'Chefs Département', icon: 'professors' }
+    { path: '/admin/chef-departement', label: 'Chefs de département', icon: 'professors' }
   ],
   utile: [
     { path: '/admin/create-account', label: 'Créer un compte', icon: 'add' },
-    { path: '/admin/create-filiere', label: 'Gestion filières', icon: 'domains' }
+    { path: '/admin/create-filiere', label: 'Gestion des filières', icon: 'domains' }
   ]
 };
 
@@ -62,15 +62,15 @@ export const adminNavigationConfig = {
  */
 export const studentNavigationConfig = {
   principal: [
-    { path: '/student/home', label: "Dashboard", icon: 'home' }
+    { path: '/student/home', label: 'Tableau de bord', icon: 'home' }
   ],
   listes: [
-    { path: '/student/pfe', label: "Parcourir les PFEs", icon: 'all-projects' },
-    { path: '/student/applications', label: "Mes Postulations", icon: 'requests' },
-    { path: '/student/mypfe', label: "Mon PFE", icon: 'folder' }
+    { path: '/student/pfe', label: 'Parcourir les PFEs', icon: 'all-projects' },
+    { path: '/student/applications', label: 'Mes candidatures', icon: 'requests' },
+    { path: '/student/mypfe', label: 'Mon PFE', icon: 'folder' }
   ],
   utile: [
-    { path: '/student/profile', label: "Mon Profil", icon: 'students' }
+    { path: '/student/profile', label: 'Mon profil', icon: 'students' }
   ]
 };
 
