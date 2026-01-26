@@ -110,7 +110,6 @@ const PendingStudents = () => {
             onClick={() => handleActivate(row.id, row.name)}
             disabled={actionLoading === row.id}
           >
-            <Check size={16} />
             {actionLoading === row.id ? '...' : 'Activer'}
           </button>
           <button
@@ -119,7 +118,6 @@ const PendingStudents = () => {
             onClick={() => handleReject(row.id, row.name)}
             disabled={actionLoading === row.id}
           >
-            <X size={16} />
             Rejeter
           </button>
         </div>
