@@ -4,11 +4,13 @@ import { useAuth } from '../../context/AuthContext';
 import filiereService from '../../services/api/filiere.service';
 import Swal from 'sweetalert2';
 import MultiStepForm from './MultiStepForm';
+import filiereService from '../../services/api/filiere.service';
 import './SignUpForm.css';
 
 const SignUpForm = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [departments, setDepartments] = useState([]);
 
@@ -77,71 +79,42 @@ const SignUpForm = () => {
   const handleSubmit = async (formData) => {
     if (isSubmitting) return;
 
-    // Validate passwords match
-    if (formData.password !== formData.confirmPassword) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erreur',
-        text: 'Les mots de passe ne correspondent pas',
-        confirmButtonColor: '#a65b43'
-      });
-      return;
-    }
-
-    // Validate terms accepted
-    if (!formData.acceptTerms) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erreur',
-        text: 'Vous devez accepter les conditions d\'utilisation',
-        confirmButtonColor: '#a65b43'
-      });
-      return;
-    }
+    setServerError('');
 
     setIsSubmitting(true);
 
-    // Prepare data for API - Only students can register
     const registrationData = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
+      firstName: formData.firstName?.trim(),
+      lastName: formData.lastName?.trim(),
+      email: formData.email?.trim(),
       password: formData.password,
       phone: formData.phone || '',
       cne: formData.cne || '',
-      cin: formData.cin,
-      department: formData.department,
-      role: 2, // Student role only
+      cin: formData.cin?.trim(),
+      department: formData.department, // id as string
+      role: 2, // Student only
       dateNaissance: formData.dateNaissance
     };
 
-    const result = await register(registrationData);
+    try {
+      const result = await register(registrationData);
 
-    setIsSubmitting(false);
-
-    if (result.success) {
-      Swal.fire({
-        icon: 'success',
-        title: 'Inscription réussie!',
-        text: 'Votre compte a été créé. Veuillez attendre l\'activation par l\'administrateur.',
-        confirmButtonColor: '#a65b43'
-      }).then(() => {
-        navigate('/login');
-      });
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erreur d\'inscription',
-        text: result.error,
-        confirmButtonColor: '#a65b43'
-      });
+      if (result?.success) {
+        // pro UX: redirect, you can also pass state message to login page
+        navigate('/login', { state: { justRegistered: true } });
+      } else {
+        setServerError(result?.error || "Une erreur est survenue lors de l'inscription.");
+      }
+    } catch (e) {
+      setServerError("Une erreur est survenue lors de l'inscription.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="signup-container">
       <div className="signup-wrapper">
-
         <MultiStepForm
           steps={steps}
           onSubmit={handleSubmit}
@@ -149,12 +122,11 @@ const SignUpForm = () => {
           subtitle="Rejoignez la plateforme PFE Manager"
           submitLabel="S'inscrire"
           isSubmitting={isSubmitting}
+          serverError={serverError}
+          
         />
 
-        <div className="signup-footer">
-          <span>Déjà inscrit?</span>
-          <Link to="/login" className="login-link">Se connecter</Link>
-        </div>
+
       </div>
     </div>
   );

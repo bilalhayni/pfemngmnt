@@ -1,9 +1,27 @@
+.form-field__error {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #d32f2f;
+}
+
+.multistep-form__server-error {
+  margin: 12px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(211, 47, 47, 0.08);
+  color: #b71c1c;
+  font-size: 13px;
+}
+
+
+
 /* Multi-Step Form Container */
 .multistep-form {
   background-color: #ffffff;
   border-radius: 16px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  padding: 40px;
+  padding: 20px 40px;
   width: 100%;
   max-width: 700px;
   margin: 0 auto;
@@ -271,7 +289,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 32px;
+  margin-top: 24px;
   padding-top: 24px;
   border-top: 1px solid #e5e7eb;
 }
@@ -311,7 +329,7 @@
 
 .multistep-form__btn--next,
 .multistep-form__btn--submit {
-  background-color: #a65b43;
+  background-color: #a65b43 !important;
   color: #ffffff;
 }
 

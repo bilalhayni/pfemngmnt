@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Swal from 'sweetalert2';
 import './LoginForm.css';
@@ -10,7 +11,7 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const { login, resetPassword, ROLES } = useAuth();
+  const { login, resetPassword, getRedirectPath, ROLES } = useAuth();
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -41,8 +42,9 @@ const LoginForm = () => {
     setIsLoading(false);
 
     if (result.success) {
-      // All users go to the same /home route
-      navigate('/home');
+      // Redirect users to role-specific home page
+      const redirectPath = getRedirectPath();
+      navigate(redirectPath);
     } else {
       Swal.fire({
         icon: 'error',
@@ -154,9 +156,7 @@ const LoginForm = () => {
             >
               {isLoading ? (
                 <span className="login-button__loading">
-                  <svg className="spinner" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" />
-                  </svg>
+                  <Loader2 className="spinner" size={20} />
                   Connexion...
                 </span>
               ) : (

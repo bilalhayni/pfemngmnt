@@ -233,3 +233,57 @@
   margin-bottom: 1rem;
   font-size: 0.875rem;
 }
+
+
+/* Fix Actions Column Width */
+.data-table th:last-child,
+.data-table td:last-child {
+  min-width: 180px;
+  width: auto;
+  overflow: visible;
+}
+
+/* Table Actions Container */
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  overflow: visible;
+}
+
+/* Base Action Button - Fixed */
+.table-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+/* Activate Button */
+.table-action-btn--activate {
+  background: #10b981;
+}
+
+.table-action-btn--activate:hover:not(:disabled) {
+  background: #059669;
+}
+
+/* Reject Button */
+.table-action-btn--reject {
+  background: #ef4444;
+}
+
+.table-action-btn--reject:hover:not(:disabled) {
+  background: #dc2626;
+}

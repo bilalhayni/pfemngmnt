@@ -1,39 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Users, User, Briefcase, LayoutGrid, TrendingUp, CheckCircle } from 'lucide-react';
 import './StatCard.css';
 
 const StatCard = ({ title, value, subtitle, icon, iconBgColor }) => {
-  const renderIcon = () => {
-    const icons = {
-      professors: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-        </svg>
-      ),
-      students: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-      ),
-      projects: (
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4z" />
-        </svg>
-      ),
-      domains: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <rect x="3" y="3" width="7" height="7" />
-          <rect x="14" y="3" width="7" height="7" />
-          <rect x="14" y="14" width="7" height="7" />
-          <rect x="3" y="14" width="7" height="7" />
-        </svg>
-      )
-    };
-    return icons[icon] || null;
+  const icons = {
+    professors: <Users size={24} />,
+    students: <User size={24} />,
+    projects: <Briefcase size={24} />,
+    domains: <LayoutGrid size={24} />,
+    progress: <TrendingUp size={24} />,
+    check: <CheckCircle size={24} />
   };
 
   return (
@@ -44,7 +21,7 @@ const StatCard = ({ title, value, subtitle, icon, iconBgColor }) => {
           className="stat-card__icon"
           style={{ backgroundColor: iconBgColor || '#a65b43' }}
         >
-          {renderIcon()}
+          {icons[icon] || null}
         </div>
       </div>
       <div className="stat-card__body">
@@ -59,7 +36,7 @@ StatCard.propTypes = {
   title: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   subtitle: PropTypes.string,
-  icon: PropTypes.oneOf(['professors', 'students', 'projects', 'domains']),
+  icon: PropTypes.oneOf(['professors', 'students', 'projects', 'domains', 'progress', 'check']),
   iconBgColor: PropTypes.string
 };
 

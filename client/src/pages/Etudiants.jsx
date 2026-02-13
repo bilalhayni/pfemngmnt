@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Eye } from 'lucide-react';
 import { Layout } from '../components/layout';
 import { DataTable, PageHeader } from '../components/common';
 import { useAuth } from '../context/AuthContext';
@@ -84,10 +85,7 @@ const Etudiants = () => {
             title="Voir le profil"
             onClick={() => navigate(`/users/${row.id}`)}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
+            <Eye size={16} />
           </button>
         </div>
       )

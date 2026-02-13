@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import './DataTable.css';
 
 const DataTable = ({
@@ -8,10 +9,12 @@ const DataTable = ({
   onRowClick,
   emptyMessage = "Aucune donnée disponible",
   searchable = true,
-  searchPlaceholder = "Rechercher..."
+  searchPlaceholder = "Rechercher...",
+  itemsPerPage = 5
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleSort = (key) => {
     let direction = 'asc';
@@ -40,20 +43,65 @@ const DataTable = ({
     return 0;
   });
 
+  // Pagination logic
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = sortedData.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search changes
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  // Generate page numbers
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+
+    return pages;
+  };
+
   return (
     <div className="data-table">
       {searchable && (
         <div className="data-table__search">
-          <svg className="data-table__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8" />
-            <path d="M21 21l-4.35-4.35" />
-          </svg>
+          <Search className="data-table__search-icon" size={18} />
           <input
             type="text"
             className="data-table__search-input"
             placeholder={searchPlaceholder}
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearch}
           />
         </div>
       )}
@@ -79,14 +127,14 @@ const DataTable = ({
             </tr>
           </thead>
           <tbody>
-            {sortedData.length === 0 ? (
+            {paginatedData.length === 0 ? (
               <tr>
                 <td colSpan={columns.length} className="data-table__empty">
                   {emptyMessage}
                 </td>
               </tr>
             ) : (
-              sortedData.map((row, index) => (
+              paginatedData.map((row, index) => (
                 <tr
                   key={row.id || index}
                   className={`data-table__row ${onRowClick ? 'data-table__row--clickable' : ''}`}
@@ -107,7 +155,50 @@ const DataTable = ({
       <div className="data-table__footer">
         <span className="data-table__count">
           {sortedData.length} résultat{sortedData.length !== 1 ? 's' : ''}
+
+          {sortedData.length > 0 && (
+           
+           <span className="data-table__showing">
+              {' '}(affichage {startIndex + 1}-{Math.min(endIndex, sortedData.length)})
+            </span>
+          
+          )}
+      
         </span>
+
+        {totalPages > 1 && (
+          <div className="data-table__pagination">
+            <button
+              className="data-table__page-btn data-table__page-btn--nav"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft size={16} />
+            </button>
+
+            {getPageNumbers().map((page, index) => (
+              page === '...' ? (
+                <span key={`ellipsis-${index}`} className="data-table__page-ellipsis">...</span>
+              ) : (
+                <button
+                  key={page}
+                  className={`data-table__page-btn ${currentPage === page ? 'data-table__page-btn--active' : ''}`}
+                  onClick={() => handlePageChange(page)}
+                >
+                  {page}
+                </button>
+              )
+            ))}
+
+            <button
+              className="data-table__page-btn data-table__page-btn--nav"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -126,14 +217,16 @@ DataTable.propTypes = {
   onRowClick: PropTypes.func,
   emptyMessage: PropTypes.string,
   searchable: PropTypes.bool,
-  searchPlaceholder: PropTypes.string
+  searchPlaceholder: PropTypes.string,
+  itemsPerPage: PropTypes.number
 };
 
 DataTable.defaultProps = {
   emptyMessage: 'Aucune donnée disponible',
   searchable: true,
   searchPlaceholder: 'Rechercher...',
-  onRowClick: null
+  onRowClick: null,
+  itemsPerPage: 5
 };
 
 export default DataTable;
